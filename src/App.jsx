@@ -15,7 +15,7 @@ import ForgotPassword from "./components/auth/ForgotPassword";
 // Layout Components
 import AppLayout from "./components/layout/AppLayout";
 
-import { Dashboard } from "./pages/TempPages";
+import Dashboard from "./pages/Dashboard";
 import Expenses from "./pages/Expenses";
 import Settings from "./pages/Settings";
 

@@ -8,6 +8,7 @@ import "./styles/auth.css";
 import "./styles/layout.css";
 import "./styles/settings.css";
 import "./styles/expenses.css";
+import "./styles/dashboard.css";
 
 // Create root and render app
 const container = document.getElementById("root");

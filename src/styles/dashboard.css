@@ -1,0 +1,1227 @@
+/* =====================================================
+   DASHBOARD MODULE STYLES
+   ===================================================== */
+
+/* Dashboard Container */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 100%;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.header-content {
+  flex: 1;
+}
+
+.dashboard-subtitle {
+  color: var(--md-sys-color-on-surface-variant);
+  margin-top: 8px;
+}
+
+/* Loading and Error States */
+.dashboard-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.dashboard-error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.dashboard-error .error-message {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  text-align: center;
+}
+
+.dashboard-error .error-icon {
+  font-size: 24px;
+}
+
+/* Empty Dashboard */
+.dashboard-empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.empty-dashboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  background: var(--md-sys-color-surface-variant);
+  border-radius: 12px;
+  border: 2px dashed var(--md-sys-color-outline-variant);
+  max-width: 400px;
+}
+
+.empty-dashboard .empty-icon {
+  font-size: 64px;
+  margin-bottom: 24px;
+  opacity: 0.6;
+}
+
+.empty-dashboard h2 {
+  margin-bottom: 16px;
+  color: var(--md-sys-color-on-surface);
+}
+
+.empty-dashboard p {
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: 24px;
+  line-height: 1.4;
+}
+
+/* Period Indicator */
+.period-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.period-title {
+  color: var(--md-sys-color-primary);
+  text-align: center;
+  margin: 0;
+}
+
+/* =====================================================
+     PERIOD SELECTOR STYLES
+     ===================================================== */
+
+.period-selector {
+  position: relative;
+  display: inline-block;
+}
+
+.period-selector-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  min-width: 200px;
+  justify-content: space-between;
+}
+
+.selector-text {
+  flex: 1;
+  text-align: left;
+}
+
+.selector-icon {
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+.period-selector-button[aria-expanded="true"] .selector-icon {
+  transform: rotate(180deg);
+}
+
+.period-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 100;
+  min-width: 300px;
+  max-width: 400px;
+  background: var(--md-sys-color-surface);
+  border-radius: 12px;
+  box-shadow: var(--md-sys-elevation-level3);
+  padding: 16px;
+  margin-top: 8px;
+  animation: dropdownSlideIn 0.2s ease-out;
+}
+
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.period-section {
+  margin-bottom: 20px;
+}
+
+.period-section:last-child {
+  margin-bottom: 0;
+}
+
+.period-section-title {
+  margin-bottom: 12px;
+  color: var(--md-sys-color-on-surface);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  padding-bottom: 8px;
+}
+
+.quick-periods {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.year-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.month-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.period-option {
+  padding: 8px 12px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 8px;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.period-option:hover {
+  background: var(--md-sys-color-surface-variant);
+  border-color: var(--md-sys-color-outline);
+}
+
+.period-option.active {
+  background: var(--md-sys-color-primary);
+  border-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+}
+
+.period-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99;
+}
+
+/* =====================================================
+     DASHBOARD GRID LAYOUT
+     ===================================================== */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 24px;
+  align-items: start;
+}
+
+.dashboard-main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.dashboard-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* =====================================================
+     SUMMARY CARDS STYLES
+     ===================================================== */
+
+.dashboard-summary {
+  margin-bottom: 8px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.summary-card {
+  padding: 20px;
+  background: var(--md-sys-color-surface);
+  border-radius: 12px;
+  box-shadow: var(--md-sys-elevation-level1);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-card:hover {
+  box-shadow: var(--md-sys-elevation-level2);
+  transform: translateY(-1px);
+}
+
+.summary-card.primary {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+
+.summary-card.secondary {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+
+.summary-card.tertiary {
+  background: var(--md-sys-color-surface-variant);
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.summary-card.neutral {
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  border: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.summary-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.card-icon {
+  font-size: 24px;
+  opacity: 0.8;
+}
+
+.trend-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.trend-indicator.up {
+  color: #4caf50;
+}
+
+.trend-indicator.down {
+  color: #f44336;
+}
+
+.trend-indicator.neutral {
+  color: #9e9e9e;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-value {
+  font-weight: 600;
+  margin: 0;
+}
+
+.card-title {
+  opacity: 0.8;
+  margin: 0;
+}
+
+/* =====================================================
+     WIDGET STYLES
+     ===================================================== */
+
+.widget {
+  background: var(--md-sys-color-surface);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--md-sys-elevation-level1);
+}
+
+.widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.widget-title {
+  margin: 0;
+  color: var(--md-sys-color-on-surface);
+}
+
+.widget-total {
+  color: var(--md-sys-color-primary);
+  font-weight: 600;
+  margin: 0;
+}
+
+.widget-footer {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.full-width {
+  width: 100%;
+}
+
+.view-all-link {
+  color: var(--md-sys-color-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.view-all-link:hover {
+  color: var(--md-sys-color-primary-container);
+  text-decoration: underline;
+}
+
+/* Empty Widget States */
+.empty-widget,
+.empty-chart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.empty-widget .empty-icon,
+.empty-chart .empty-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.empty-widget p,
+.empty-chart p {
+  color: var(--md-sys-color-on-surface-variant);
+  margin: 0;
+}
+
+/* =====================================================
+     EXPENSE CHART STYLES
+     ===================================================== */
+
+.expense-chart {
+  min-height: 300px;
+}
+
+.chart-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.chart-total {
+  color: var(--md-sys-color-primary);
+  font-weight: 600;
+  margin: 0;
+}
+
+.chart-period {
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.chart-container {
+  height: 200px;
+  margin-top: 20px;
+}
+
+.chart-wrapper {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  height: 100%;
+  gap: 4px;
+  padding: 0 8px;
+}
+
+.chart-bar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  max-width: 40px;
+  height: 100%;
+}
+
+.chart-bar {
+  width: 100%;
+  min-height: 4px;
+  background: var(--md-sys-color-surface-variant);
+  border-radius: 2px 2px 0 0;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 8px;
+}
+
+.chart-bar:hover {
+  opacity: 0.8;
+}
+
+.bar-fill {
+  width: 100%;
+  height: 100%;
+  background: var(--md-sys-color-primary);
+  border-radius: 2px 2px 0 0;
+}
+
+.chart-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+}
+
+.label-date {
+  color: var(--md-sys-color-on-surface-variant);
+  font-weight: 500;
+}
+
+.label-amount {
+  color: var(--md-sys-color-on-surface);
+  font-weight: 600;
+}
+
+/* =====================================================
+     MONTHLY TREND STYLES
+     ===================================================== */
+
+.monthly-trend {
+  min-height: 250px;
+}
+
+.trend-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.trend-total {
+  color: var(--md-sys-color-primary);
+  font-weight: 600;
+  margin: 0;
+}
+
+.monthly-chart {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  height: 150px;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.month-bar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  height: 100%;
+  min-width: 0;
+}
+
+.month-info {
+  margin-bottom: 8px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.month-amount {
+  color: var(--md-sys-color-on-surface);
+  font-weight: 600;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.month-bar-wrapper {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.month-bar {
+  width: 24px;
+  min-height: 4px;
+  background: var(--md-sys-color-primary);
+  border-radius: 2px 2px 0 0;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.month-bar:hover {
+  opacity: 1;
+  transform: scaleX(1.1);
+}
+
+.month-bar.current {
+  background: var(--md-sys-color-secondary);
+  opacity: 1;
+}
+
+.month-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.month-name {
+  color: var(--md-sys-color-on-surface-variant);
+  font-weight: 500;
+  font-size: 0.75rem;
+}
+
+.month-name.current {
+  color: var(--md-sys-color-secondary);
+  font-weight: 600;
+}
+
+.month-count {
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 0.625rem;
+}
+
+/* =====================================================
+     CATEGORY BREAKDOWN STYLES
+     ===================================================== */
+
+.category-breakdown {
+  min-height: 300px;
+}
+
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.category-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.category-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.category-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 16px;
+  color: white;
+  font-weight: 500;
+}
+
+.category-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.category-name {
+  color: var(--md-sys-color-on-surface);
+  font-weight: 500;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.category-count {
+  color: var(--md-sys-color-on-surface-variant);
+  margin: 0;
+}
+
+.category-amount {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.amount-value {
+  color: var(--md-sys-color-on-surface);
+  font-weight: 600;
+  margin: 0;
+}
+
+.amount-percentage {
+  color: var(--md-sys-color-on-surface-variant);
+  margin: 0;
+}
+
+.category-progress {
+  width: 100%;
+  height: 4px;
+  background: var(--md-sys-color-surface-variant);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* =====================================================
+     RECENT EXPENSES STYLES
+     ===================================================== */
+
+.recent-expenses {
+  min-height: 400px;
+}
+
+.expenses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.expense-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--md-sys-color-surface-variant);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.expense-item:hover {
+  background: var(--md-sys-color-primary-container);
+}
+
+.expense-icon-container {
+  flex-shrink: 0;
+}
+
+.expense-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: white;
+  font-weight: 500;
+}
+
+.expense-details {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.expense-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.expense-entity {
+  color: var(--md-sys-color-on-surface);
+  font-weight: 500;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.expense-amount {
+  color: var(--md-sys-color-primary);
+  font-weight: 600;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.expense-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.expense-category,
+.expense-date {
+  color: var(--md-sys-color-on-surface-variant);
+  margin: 0;
+}
+
+.expense-description {
+  margin-top: 4px;
+}
+
+.description-text {
+  color: var(--md-sys-color-on-surface-variant);
+  font-style: italic;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.expense-actions {
+  flex-shrink: 0;
+}
+
+.expense-action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.expense-action-button:hover {
+  transform: scale(1.1);
+}
+
+/* =====================================================
+     INSIGHTS WIDGET STYLES
+     ===================================================== */
+
+.insights-widget {
+  min-height: 250px;
+}
+
+.insights-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.insight-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid;
+}
+
+.insight-item.warning {
+  background: rgba(255, 152, 0, 0.1);
+  border-left-color: #ff9800;
+}
+
+.insight-item.info {
+  background: rgba(33, 150, 243, 0.1);
+  border-left-color: #2196f3;
+}
+
+.insight-item.success {
+  background: rgba(76, 175, 80, 0.1);
+  border-left-color: #4caf50;
+}
+
+.insight-item.neutral {
+  background: var(--md-sys-color-surface-variant);
+  border-left-color: var(--md-sys-color-outline);
+}
+
+.insight-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.insight-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.insight-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.insight-title {
+  color: var(--md-sys-color-on-surface);
+  font-weight: 500;
+  margin: 0;
+  flex: 1;
+}
+
+.insight-value {
+  color: var(--md-sys-color-primary);
+  font-weight: 600;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.insight-description {
+  color: var(--md-sys-color-on-surface-variant);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.insights-tips {
+  padding-top: 16px;
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.tip-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: var(--md-sys-color-surface-variant);
+  border-radius: 6px;
+}
+
+.tip-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.tip-text {
+  color: var(--md-sys-color-on-surface-variant);
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* =====================================================
+     ENTITY LIST STYLES
+     ===================================================== */
+
+.entity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.entity-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--md-sys-color-surface-variant);
+  border-radius: 8px;
+}
+
+.entity-rank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.entity-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.entity-name {
+  color: var(--md-sys-color-on-surface);
+  font-weight: 500;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entity-amount {
+  color: var(--md-sys-color-on-surface-variant);
+  margin: 0;
+}
+
+.entity-percentage {
+  color: var(--md-sys-color-primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+/* =====================================================
+     RESPONSIVE DESIGN
+     ===================================================== */
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .period-selector-button {
+    width: 100%;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .dashboard-sidebar {
+    order: -1;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .summary-card {
+    padding: 16px;
+  }
+
+  .card-value {
+    font-size: 1.25rem;
+  }
+
+  .widget {
+    padding: 16px;
+  }
+
+  .widget-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .chart-wrapper {
+    gap: 2px;
+    padding: 0 4px;
+  }
+
+  .chart-bar-container {
+    max-width: 32px;
+  }
+
+  .monthly-chart {
+    gap: 4px;
+  }
+
+  .month-bar {
+    width: 20px;
+  }
+
+  .category-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .category-amount {
+    align-items: flex-start;
+  }
+
+  .expense-main {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .expense-amount {
+    text-align: left;
+  }
+
+  .period-dropdown {
+    right: auto;
+    left: 0;
+    width: calc(100vw - 32px);
+    max-width: none;
+  }
+
+  .year-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .month-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-container {
+    height: 150px;
+  }
+
+  .monthly-chart {
+    height: 120px;
+  }
+
+  .label-amount {
+    font-size: 0.625rem;
+  }
+
+  .month-amount {
+    font-size: 0.625rem;
+  }
+}
+
+/* Tablet Layout */
+@media (min-width: 769px) and (max-width: 1023px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr 300px;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Desktop Layout */
+@media (min-width: 1024px) {
+  .dashboard-container {
+    max-width: 1400px;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .summary-card,
+  .widget,
+  .expense-item,
+  .category-item,
+  .insight-item {
+    border: 2px solid var(--md-sys-color-outline);
+  }
+
+  .chart-bar,
+  .month-bar,
+  .progress-bar {
+    border: 1px solid var(--md-sys-color-outline);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .summary-card,
+  .chart-bar,
+  .month-bar,
+  .expense-item,
+  .expense-action-button,
+  .progress-bar {
+    transition: none;
+  }
+
+  .summary-card:hover,
+  .month-bar:hover,
+  .expense-action-button:hover {
+    transform: none;
+  }
+
+  .dropdownSlideIn {
+    animation: none;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .dashboard-header,
+  .period-selector,
+  .widget-footer,
+  .expense-actions,
+  .insights-tips {
+    display: none;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .widget {
+    box-shadow: none;
+    border: 1px solid #ccc;
+    break-inside: avoid;
+    margin-bottom: 16px;
+  }
+}

@@ -78,7 +78,6 @@ export const expenseTypesService = {
     }
   },
 };
-
 // Entities service
 export const entitiesService = {
   // Get all entities for current user
@@ -184,7 +183,6 @@ export const entitiesService = {
     }
   },
 };
-
 // User preferences service
 export const userPreferencesService = {
   // Get user preferences
@@ -250,7 +248,6 @@ export const userPreferencesService = {
     }
   },
 };
-
 export const expensesService = {
   // Get all expenses for current user with filters
   getAll: async (filters = {}) => {
@@ -490,7 +487,6 @@ export const expensesService = {
     }
   },
 };
-
 // Expense documents service
 export const expenseDocumentsService = {
   // Get documents for an expense
@@ -544,6 +540,328 @@ export const expenseDocumentsService = {
       return { error: null };
     } catch (error) {
       return { error: error.message };
+    }
+  },
+};
+export const dashboardService = {
+  // Get dashboard summary for a specific period
+  getDashboardData: async (year, month = null) => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      // Build base query
+      let query = supabase
+        .from("expenses")
+        .select(
+          `
+          amount,
+          expense_date,
+          expense_type_id,
+          entity_id,
+          expense_types (id, name, icon, color),
+          entities (id, name)
+        `
+        )
+        .eq("created_by", user.id)
+        .eq("year", year);
+
+      if (month) {
+        query = query.eq("month", month);
+      }
+
+      const { data: expenses, error } = await query.order("expense_date", {
+        ascending: false,
+      });
+
+      if (error) throw error;
+
+      // Calculate summary statistics
+      const totalAmount = expenses.reduce(
+        (sum, expense) => sum + parseFloat(expense.amount),
+        0
+      );
+      const expenseCount = expenses.length;
+      const avgExpenseAmount =
+        expenseCount > 0 ? totalAmount / expenseCount : 0;
+
+      // Group by expense type
+      const byExpenseType = expenses.reduce((acc, expense) => {
+        const type = expense.expense_types;
+        const key = type.id;
+
+        if (!acc[key]) {
+          acc[key] = {
+            id: type.id,
+            name: type.name,
+            icon: type.icon,
+            color: type.color,
+            amount: 0,
+            count: 0,
+            percentage: 0,
+          };
+        }
+
+        acc[key].amount += parseFloat(expense.amount);
+        acc[key].count += 1;
+        return acc;
+      }, {});
+
+      // Calculate percentages
+      Object.values(byExpenseType).forEach((type) => {
+        type.percentage =
+          totalAmount > 0 ? (type.amount / totalAmount) * 100 : 0;
+      });
+
+      // Group by entity
+      const byEntity = expenses.reduce((acc, expense) => {
+        const entity = expense.entities;
+        const key = entity.id;
+
+        if (!acc[key]) {
+          acc[key] = {
+            id: entity.id,
+            name: entity.name,
+            amount: 0,
+            count: 0,
+            percentage: 0,
+          };
+        }
+
+        acc[key].amount += parseFloat(expense.amount);
+        acc[key].count += 1;
+        return acc;
+      }, {});
+
+      // Calculate entity percentages
+      Object.values(byEntity).forEach((entity) => {
+        entity.percentage =
+          totalAmount > 0 ? (entity.amount / totalAmount) * 100 : 0;
+      });
+
+      // Group by day for trend analysis
+      const dailyExpenses = expenses.reduce((acc, expense) => {
+        const date = expense.expense_date;
+        if (!acc[date]) {
+          acc[date] = {
+            date,
+            amount: 0,
+            count: 0,
+          };
+        }
+        acc[date].amount += parseFloat(expense.amount);
+        acc[date].count += 1;
+        return acc;
+      }, {});
+
+      const dailyTrend = Object.values(dailyExpenses).sort(
+        (a, b) => new Date(a.date) - new Date(b.date)
+      );
+
+      return {
+        data: {
+          summary: {
+            totalAmount,
+            expenseCount,
+            avgExpenseAmount,
+            period: month ? `${month}/${year}` : year.toString(),
+          },
+          byExpenseType: Object.values(byExpenseType).sort(
+            (a, b) => b.amount - a.amount
+          ),
+          byEntity: Object.values(byEntity)
+            .sort((a, b) => b.amount - a.amount)
+            .slice(0, 10), // Top 10 entities
+          dailyTrend,
+          recentExpenses: expenses.slice(0, 5),
+        },
+        error: null,
+      };
+    } catch (error) {
+      return { data: null, error: error.message };
+    }
+  },
+
+  // Get monthly comparison data
+  getMonthlyComparison: async (year) => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { data: expenses, error } = await supabase
+        .from("expenses")
+        .select("amount, month, expense_types (name, color)")
+        .eq("created_by", user.id)
+        .eq("year", year)
+        .order("month");
+
+      if (error) throw error;
+
+      // Group by month
+      const monthlyData = Array.from({ length: 12 }, (_, i) => ({
+        month: i + 1,
+        monthName: new Date(year, i).toLocaleDateString("en-US", {
+          month: "short",
+        }),
+        amount: 0,
+        count: 0,
+      }));
+
+      expenses.forEach((expense) => {
+        const monthIndex = expense.month - 1;
+        if (monthIndex >= 0 && monthIndex < 12) {
+          monthlyData[monthIndex].amount += parseFloat(expense.amount);
+          monthlyData[monthIndex].count += 1;
+        }
+      });
+
+      return { data: monthlyData, error: null };
+    } catch (error) {
+      return { data: null, error: error.message };
+    }
+  },
+
+  // Get year over year comparison
+  getYearlyComparison: async (currentYear, previousYear) => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { data: expenses, error } = await supabase
+        .from("expenses")
+        .select("amount, year, month")
+        .eq("created_by", user.id)
+        .in("year", [currentYear, previousYear]);
+
+      if (error) throw error;
+
+      const currentYearData = expenses
+        .filter((expense) => expense.year === currentYear)
+        .reduce((sum, expense) => sum + parseFloat(expense.amount), 0);
+
+      const previousYearData = expenses
+        .filter((expense) => expense.year === previousYear)
+        .reduce((sum, expense) => sum + parseFloat(expense.amount), 0);
+
+      const change =
+        previousYearData > 0
+          ? ((currentYearData - previousYearData) / previousYearData) * 100
+          : 0;
+
+      return {
+        data: {
+          currentYear: { year: currentYear, amount: currentYearData },
+          previousYear: { year: previousYear, amount: previousYearData },
+          change,
+          changeType:
+            change > 0 ? "increase" : change < 0 ? "decrease" : "neutral",
+        },
+        error: null,
+      };
+    } catch (error) {
+      return { data: null, error: error.message };
+    }
+  },
+
+  // Get expense trends and insights
+  getInsights: async (year) => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { data: expenses, error } = await supabase
+        .from("expenses")
+        .select(
+          `
+          amount,
+          expense_date,
+          month,
+          expense_types (name, color)
+        `
+        )
+        .eq("created_by", user.id)
+        .eq("year", year);
+
+      if (error) throw error;
+
+      const insights = [];
+
+      // Most expensive month
+      const monthlyTotals = expenses.reduce((acc, expense) => {
+        acc[expense.month] =
+          (acc[expense.month] || 0) + parseFloat(expense.amount);
+        return acc;
+      }, {});
+
+      const mostExpensiveMonth = Object.entries(monthlyTotals).reduce(
+        (max, [month, amount]) =>
+          amount > max.amount ? { month: parseInt(month), amount } : max,
+        { month: 1, amount: 0 }
+      );
+
+      if (mostExpensiveMonth.amount > 0) {
+        insights.push({
+          type: "most_expensive_month",
+          title: "Highest Spending Month",
+          description: `You spent the most in ${new Date(
+            year,
+            mostExpensiveMonth.month - 1
+          ).toLocaleDateString("en-US", { month: "long" })}`,
+          value: mostExpensiveMonth.amount,
+          icon: "📈",
+        });
+      }
+
+      // Average daily spending
+      const totalDays =
+        expenses.length > 0
+          ? new Set(expenses.map((e) => e.expense_date)).size
+          : 0;
+
+      if (totalDays > 0) {
+        const dailyAvg = monthlyTotals[new Date().getMonth() + 1] / totalDays;
+        insights.push({
+          type: "daily_average",
+          title: "Daily Average This Month",
+          description: `On average, you spend this much per day`,
+          value: dailyAvg,
+          icon: "📅",
+        });
+      }
+
+      // Most frequent expense type
+      const typeFrequency = expenses.reduce((acc, expense) => {
+        const typeName = expense.expense_types.name;
+        acc[typeName] = (acc[typeName] || 0) + 1;
+        return acc;
+      }, {});
+
+      const topType = Object.entries(typeFrequency).reduce(
+        (max, [type, count]) => (count > max.count ? { type, count } : max),
+        { type: "", count: 0 }
+      );
+
+      if (topType.count > 0) {
+        insights.push({
+          type: "most_frequent",
+          title: "Most Frequent Category",
+          description: `${topType.type} appears most often in your expenses`,
+          value: topType.count,
+          icon: "🎯",
+        });
+      }
+
+      return { data: insights, error: null };
+    } catch (error) {
+      return { data: null, error: error.message };
     }
   },
 };
