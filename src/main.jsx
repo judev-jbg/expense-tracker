@@ -6,6 +6,7 @@ import App from "./App.jsx";
 import "./index.css";
 import "./styles/auth.css";
 import "./styles/layout.css";
+import "./styles/settings.css";
 
 // Create root and render app
 const container = document.getElementById("root");

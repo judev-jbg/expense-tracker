@@ -15,8 +15,8 @@ import ForgotPassword from "./components/auth/ForgotPassword";
 // Layout Components
 import AppLayout from "./components/layout/AppLayout";
 
-// Temporary Page Components (will be replaced in next modules)
-import { Dashboard, Expenses, Settings } from "./pages/TempPages";
+import { Dashboard, Expenses } from "./pages/TempPages";
+import Settings from "./pages/Settings";
 
 // Loading Component
 const LoadingScreen = () => (
