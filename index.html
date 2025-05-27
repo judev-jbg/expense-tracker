@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- App Info -->
+    <title>Expense Tracker</title>
+    <meta
+      name="description"
+      content="Personal expense tracking application with modern Material Design"
+    />
+
+    <!-- Theme and PWA Meta Tags -->
+    <meta name="theme-color" content="#121212" />
+    <meta name="color-scheme" content="dark light" />
+
+    <!-- Mobile Optimization -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Expense Tracker" />
+
+    <!-- Prevent zoom on inputs (iOS) -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate icon" href="/favicon.ico" />
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="/src/main.jsx" as="script" />
+
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+
+    <!-- Set initial theme to prevent flash -->
+    <script>
+      // Set initial theme from localStorage or default to dark
+      (function () {
+        const savedTheme = localStorage.getItem("expense-app-theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+
+        // Update meta theme-color
+        const metaThemeColor = document.querySelector(
+          'meta[name="theme-color"]'
+        );
+        if (metaThemeColor) {
+          metaThemeColor.setAttribute(
+            "content",
+            savedTheme === "dark" ? "#121212" : "#ffffff"
+          );
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- App Root -->
+    <div id="root"></div>
+
+    <!-- Loading Fallback (shown while JS loads) -->
+    <noscript>
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
+          font-family: system-ui, sans-serif;
+          text-align: center;
+          padding: 2rem;
+          background: #121212;
+          color: #ffffff;
+        "
+      >
+        <div>
+          <h1 style="margin-bottom: 1rem">💰 Expense Tracker</h1>
+          <p>Please enable JavaScript to use this application.</p>
+        </div>
+      </div>
+    </noscript>
+
+    <!-- Main App Script -->
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
