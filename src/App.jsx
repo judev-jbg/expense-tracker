@@ -6,10 +6,10 @@ import {
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { RoleProvider } from "./contexts/RoleContext";
 
 // Auth Components
 import Login from "./components/auth/Login";
-import Register from "./components/auth/Register";
 import ForgotPassword from "./components/auth/ForgotPassword";
 
 // Layout Components
@@ -40,7 +40,7 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  return children;
+  return <RoleProvider>{children}</RoleProvider>;
 };
 
 // Public Route Component (redirect to dashboard if already authenticated)
@@ -68,14 +68,6 @@ const AppRoutes = () => {
         element={
           <PublicRoute>
             <Login />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/register"
-        element={
-          <PublicRoute>
-            <Register />
           </PublicRoute>
         }
       />

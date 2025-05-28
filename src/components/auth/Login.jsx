@@ -165,12 +165,10 @@ const Login = () => {
           </button>
         </form>
 
+        {/* Remove the auth-footer section that had the "Sign up" link */}
         <div className="auth-footer">
-          <p className="md-typescale-body-medium">
-            Don't have an account?{" "}
-            <Link to="/register" className="auth-link">
-              Sign up
-            </Link>
+          <p className="md-typescale-body-small auth-note">
+            Contact your administrator if you need an account.
           </p>
         </div>
       </div>

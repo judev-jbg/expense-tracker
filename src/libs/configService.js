@@ -865,3 +865,186 @@ export const dashboardService = {
     }
   },
 };
+export const userManagementService = {
+  // Check if current user is admin
+  isAdmin: async () => {
+    try {
+      const { data, error } = await supabase.rpc("is_admin");
+      if (error) throw error;
+      return { isAdmin: data, error: null };
+    } catch (error) {
+      return { isAdmin: false, error: error.message };
+    }
+  },
+
+  // Get current user role
+  getUserRole: async () => {
+    try {
+      const { data, error } = await supabase.rpc("get_user_role");
+      if (error) throw error;
+      return { role: data, error: null };
+    } catch (error) {
+      return { role: "user", error: error.message };
+    }
+  },
+
+  // Get all users (admin only)
+  getAllUsers: async () => {
+    try {
+      const { data, error } = await supabase
+        .from("user_management_view")
+        .select("*")
+        .order("registered_at", { ascending: false });
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error: error.message };
+    }
+  },
+
+  // Get user by ID
+  getUserById: async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from("user_management_view")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error: error.message };
+    }
+  },
+
+  // Create new user (admin only)
+  createUser: async (userData) => {
+    try {
+      // First create the user account
+      const { data: authData, error: authError } =
+        await supabase.auth.admin.createUser({
+          email: userData.email,
+          password: userData.password,
+          email_confirm: true, // Auto-confirm email
+          user_metadata: {
+            first_name: userData.firstName,
+            last_name: userData.lastName,
+            full_name: `${userData.firstName} ${userData.lastName}`,
+          },
+        });
+
+      if (authError) throw authError;
+
+      // Wait a bit for the trigger to create user preferences
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Update user preferences with correct role
+      const { error: prefsError } = await supabase
+        .from("user_preferences")
+        .update({
+          role: userData.role || "user",
+          currency: userData.currency || "EUR",
+          theme: userData.theme || "dark",
+        })
+        .eq("user_id", authData.user.id);
+
+      if (prefsError) {
+        console.error("Error updating user preferences:", prefsError);
+      }
+
+      return { data: authData.user, error: null };
+    } catch (error) {
+      return { data: null, error: error.message };
+    }
+  },
+
+  // Update user (admin only)
+  updateUser: async (userId, updates) => {
+    try {
+      const { data, error } = await supabase.auth.admin.updateUserById(userId, {
+        email: updates.email,
+        user_metadata: {
+          first_name: updates.firstName,
+          last_name: updates.lastName,
+          full_name: `${updates.firstName} ${updates.lastName}`,
+        },
+      });
+
+      if (error) throw error;
+
+      // Update user preferences
+      if (
+        updates.role ||
+        updates.currency ||
+        updates.theme ||
+        updates.hasOwnProperty("is_active")
+      ) {
+        const prefsUpdate = {};
+        if (updates.role) prefsUpdate.role = updates.role;
+        if (updates.currency) prefsUpdate.currency = updates.currency;
+        if (updates.theme) prefsUpdate.theme = updates.theme;
+        if (updates.hasOwnProperty("is_active"))
+          prefsUpdate.is_active = updates.is_active;
+
+        const { error: prefsError } = await supabase
+          .from("user_preferences")
+          .update(prefsUpdate)
+          .eq("user_id", userId);
+
+        if (prefsError) {
+          console.error("Error updating user preferences:", prefsError);
+        }
+      }
+
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error: error.message };
+    }
+  },
+
+  // Deactivate user (admin only) - we don't actually delete users
+  deactivateUser: async (userId) => {
+    try {
+      const { error } = await supabase
+        .from("user_preferences")
+        .update({ is_active: false })
+        .eq("user_id", userId);
+
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+
+  // Reactivate user (admin only)
+  reactivateUser: async (userId) => {
+    try {
+      const { error } = await supabase
+        .from("user_preferences")
+        .update({ is_active: true })
+        .eq("user_id", userId);
+
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+
+  // Reset user password (admin only)
+  resetUserPassword: async (userId, newPassword) => {
+    try {
+      const { data, error } = await supabase.auth.admin.updateUserById(userId, {
+        password: newPassword,
+      });
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error: error.message };
+    }
+  },
+};

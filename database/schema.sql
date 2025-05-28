@@ -409,3 +409,204 @@ BEGIN
     RAISE NOTICE '🚀 Your database is ready for the Expense Tracker application!';
     RAISE NOTICE '🧪 You can now test user registration without errors.';
 END $$;
+
+-- =====================================================
+-- USER ROLES AND PERMISSIONS SYSTEM
+-- =====================================================
+
+-- Create user roles enum
+CREATE TYPE user_role AS ENUM ('admin', 'user');
+
+-- Update user preferences to include role
+ALTER TABLE user_preferences 
+ADD COLUMN IF NOT EXISTS role user_role DEFAULT 'user',
+ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES auth.users(id),
+ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
+
+-- Create user management policies
+DROP POLICY IF EXISTS "Users can view own preferences" ON user_preferences;
+DROP POLICY IF EXISTS "Users can insert own preferences" ON user_preferences;
+DROP POLICY IF EXISTS "Users can update own preferences" ON user_preferences;
+DROP POLICY IF EXISTS "Users can delete own preferences" ON user_preferences;
+
+-- New RLS policies for user management
+CREATE POLICY "Users can view own preferences" ON user_preferences
+    FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Admins can view all user preferences" ON user_preferences
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM user_preferences up 
+            WHERE up.user_id = auth.uid() 
+            AND up.role = 'admin'
+            AND up.is_active = true
+        )
+    );
+
+CREATE POLICY "Users can insert own preferences" ON user_preferences
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Admins can insert user preferences" ON user_preferences
+    FOR INSERT WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM user_preferences up 
+            WHERE up.user_id = auth.uid() 
+            AND up.role = 'admin'
+            AND up.is_active = true
+        )
+    );
+
+CREATE POLICY "Users can update own preferences" ON user_preferences
+    FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Admins can update user preferences" ON user_preferences
+    FOR UPDATE USING (
+        EXISTS (
+            SELECT 1 FROM user_preferences up 
+            WHERE up.user_id = auth.uid() 
+            AND up.role = 'admin'
+            AND up.is_active = true
+        )
+    );
+
+CREATE POLICY "Admins can delete user preferences" ON user_preferences
+    FOR DELETE USING (
+        EXISTS (
+            SELECT 1 FROM user_preferences up 
+            WHERE up.user_id = auth.uid() 
+            AND up.role = 'admin'
+            AND up.is_active = true
+        )
+        AND user_id != auth.uid() -- Admins can't delete themselves
+    );
+
+-- Function to check if user is admin
+CREATE OR REPLACE FUNCTION is_admin(user_uuid UUID DEFAULT auth.uid())
+RETURNS BOOLEAN AS $$
+BEGIN
+    RETURN EXISTS (
+        SELECT 1 FROM user_preferences 
+        WHERE user_id = user_uuid 
+        AND role = 'admin' 
+        AND is_active = true
+    );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Function to get user role
+CREATE OR REPLACE FUNCTION get_user_role(user_uuid UUID DEFAULT auth.uid())
+RETURNS user_role AS $$
+DECLARE
+    user_role_result user_role;
+BEGIN
+    SELECT role INTO user_role_result 
+    FROM user_preferences 
+    WHERE user_id = user_uuid AND is_active = true;
+    
+    RETURN COALESCE(user_role_result, 'user'::user_role);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Update handle_new_user function to set first user as admin
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS TRIGGER AS $$
+DECLARE
+    user_count INTEGER;
+    user_role_to_assign user_role;
+    food_type_id UUID;
+    transport_type_id UUID;
+    utilities_type_id UUID;
+    entertainment_type_id UUID;
+    health_type_id UUID;
+BEGIN
+    -- Check if this is the first user (make them admin)
+    SELECT COUNT(*) INTO user_count FROM auth.users;
+    
+    IF user_count <= 1 THEN
+        user_role_to_assign := 'admin';
+    ELSE
+        user_role_to_assign := 'user';
+    END IF;
+
+    -- Insert default expense types for new user
+    INSERT INTO expense_types (name, description, icon, color, created_by)
+    VALUES 
+        ('Food & Dining', 'Groceries, restaurants, food delivery', '🍽️', '#4CAF50', NEW.id),
+        ('Transportation', 'Gas, public transport, car maintenance', '🚗', '#2196F3', NEW.id),
+        ('Utilities', 'Electricity, water, gas, internet', '💡', '#FF9800', NEW.id),
+        ('Entertainment', 'Movies, games, subscriptions', '🎬', '#9C27B0', NEW.id),
+        ('Healthcare', 'Medical expenses, pharmacy, insurance', '🏥', '#F44336', NEW.id),
+        ('Shopping', 'Clothing, electronics, household items', '🛍️', '#607D8B', NEW.id)
+    RETURNING id INTO food_type_id;
+
+    -- Get the IDs of created expense types
+    SELECT id INTO food_type_id FROM expense_types WHERE name = 'Food & Dining' AND created_by = NEW.id;
+    SELECT id INTO transport_type_id FROM expense_types WHERE name = 'Transportation' AND created_by = NEW.id;
+    SELECT id INTO utilities_type_id FROM expense_types WHERE name = 'Utilities' AND created_by = NEW.id;
+    SELECT id INTO entertainment_type_id FROM expense_types WHERE name = 'Entertainment' AND created_by = NEW.id;
+    SELECT id INTO health_type_id FROM expense_types WHERE name = 'Healthcare' AND created_by = NEW.id;
+
+    -- Insert some default entities
+    INSERT INTO entities (name, description, expense_type_id, created_by)
+    VALUES 
+        ('Supermarket', 'General grocery shopping', food_type_id, NEW.id),
+        ('Gas Station', 'Fuel for vehicles', transport_type_id, NEW.id),
+        ('Electric Company', 'Electricity bills', utilities_type_id, NEW.id),
+        ('Internet Provider', 'Internet and cable services', utilities_type_id, NEW.id),
+        ('Streaming Service', 'Netflix, Spotify, etc.', entertainment_type_id, NEW.id),
+        ('Pharmacy', 'Medications and health supplies', health_type_id, NEW.id);
+
+    -- Insert user preferences with role
+    INSERT INTO user_preferences (
+        user_id, 
+        theme, 
+        currency, 
+        default_expense_type_id, 
+        role,
+        created_by,
+        is_active
+    )
+    VALUES (
+        NEW.id, 
+        'dark', 
+        'EUR', 
+        food_type_id, 
+        user_role_to_assign,
+        NEW.id,
+        true
+    );
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Create view for user management (admins only)
+CREATE OR REPLACE VIEW user_management_view AS
+SELECT 
+    au.id,
+    au.email,
+    au.created_at as registered_at,
+    au.last_sign_in_at,
+    au.email_confirmed_at,
+    COALESCE(au.raw_user_meta_data->>'first_name', '') as first_name,
+    COALESCE(au.raw_user_meta_data->>'last_name', '') as last_name,
+    COALESCE(au.raw_user_meta_data->>'full_name', '') as full_name,
+    up.role,
+    up.is_active,
+    up.created_by,
+    up.created_at as profile_created_at,
+    up.currency,
+    up.theme
+FROM auth.users au
+LEFT JOIN user_preferences up ON au.id = up.user_id
+WHERE up.is_active = true
+ORDER BY au.created_at DESC;
+
+-- Grant access to the view for authenticated users
+GRANT SELECT ON user_management_view TO authenticated;
+
+-- RLS policy for the view (only admins can see all users)
+CREATE POLICY "Only admins can view user management" ON user_management_view
+    FOR SELECT USING (is_admin());
+
+COMMENT ON VIEW user_management_view IS 'View for user management - only accessible by admins';
