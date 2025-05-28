@@ -61,32 +61,6 @@
       "purpose": "maskable any"
     }
   ],
-  "shortcuts": [
-    {
-      "name": "Add Expense",
-      "short_name": "Add",
-      "description": "Quickly add a new expense",
-      "url": "/expenses?action=add",
-      "icons": [
-        {
-          "src": "/icons/add-expense-96x96.png",
-          "sizes": "96x96"
-        }
-      ]
-    },
-    {
-      "name": "View Dashboard",
-      "short_name": "Dashboard",
-      "description": "View expense summary",
-      "url": "/dashboard",
-      "icons": [
-        {
-          "src": "/icons/dashboard-96x96.png",
-          "sizes": "96x96"
-        }
-      ]
-    }
-  ],
   "screenshots": [
     {
       "src": "/screenshots/dashboard-narrow.png",
