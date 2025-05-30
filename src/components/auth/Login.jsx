@@ -2,18 +2,19 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../contexts/AuthContext";
-import { useTheme } from "../../contexts/ThemeContext";
+import Input from "../common/Input";
+import Button from "../common/Button";
+import { MdEmail, MdLock } from "react-icons/md";
 
 const Login = () => {
   const navigate = useNavigate();
   const { signIn } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
     setError,
   } = useForm({
@@ -22,6 +23,9 @@ const Login = () => {
       password: "",
     },
   });
+
+  const emailValue = watch("email");
+  const passwordValue = watch("password");
 
   const onSubmit = async (data) => {
     setIsLoading(true);
@@ -62,39 +66,30 @@ const Login = () => {
 
   return (
     <div className="auth-container">
-      <div className="auth-header">
-        <button
-          className="theme-toggle-button"
-          onClick={toggleTheme}
-          aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
-        >
-          {theme === "light" ? "🌙" : "☀️"}
-        </button>
-
-        <div className="auth-logo">
-          <h1 className="md-typescale-display-small">💰</h1>
-          <h2 className="md-typescale-headline-medium">Expense Tracker</h2>
-        </div>
-      </div>
-
       <div className="auth-card md-card">
         <div className="auth-card-header">
-          <h3 className="md-typescale-headline-small">Welcome back</h3>
+          <img
+            src="/icon-512x512.png"
+            alt="Toolstock Logo"
+            className="login-logo"
+          />
+          <h1 className="md-typescale-headline-medium">Expense Tracker</h1>
           <p className="md-typescale-body-medium auth-subtitle">
-            Sign in to your account to continue
+            Acceda a su cuenta para continuar
           </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
           <div className="md-text-field">
-            <label htmlFor="email" className="md-text-field-label">
-              Email
-            </label>
-            <input
-              id="email"
+            <Input
+              label="Correo electrónico"
               type="email"
-              className={`md-text-field-input ${errors.email ? "error" : ""}`}
-              placeholder="Enter your email"
+              id="email"
+              name="email"
+              value={emailValue}
+              required
+              icon={<MdEmail />}
+              fullWidth
               {...register("email", {
                 required: "Email is required",
                 pattern: {
@@ -102,8 +97,8 @@ const Login = () => {
                   message: "Invalid email address",
                 },
               })}
-              disabled={isLoading}
             />
+
             {errors.email && (
               <span className="md-text-field-error">
                 {errors.email.message}
@@ -111,64 +106,39 @@ const Login = () => {
             )}
           </div>
 
-          <div className="md-text-field">
-            <label htmlFor="password" className="md-text-field-label">
-              Password
-            </label>
-            <div className="password-field-container">
-              <input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                className={`md-text-field-input ${
-                  errors.password ? "error" : ""
-                }`}
-                placeholder="Enter your password"
-                {...register("password", {
-                  required: "Password is required",
-                  minLength: {
-                    value: 6,
-                    message: "Password must be at least 6 characters",
-                  },
-                })}
-                disabled={isLoading}
-              />
-              <button
-                type="button"
-                className="password-toggle-button"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? "👁️" : "👁️‍🗨️"}
-              </button>
-            </div>
-            {errors.password && (
-              <span className="md-text-field-error">
-                {errors.password.message}
-              </span>
-            )}
-          </div>
+          <Input
+            label="Contraseña"
+            type="password" // El tipo inicial es password
+            id="password"
+            name="password"
+            value={passwordValue}
+            required
+            icon={<MdLock />}
+            fullWidth
+            {...register("password", {
+              required: "Password is required",
+              minLength: {
+                value: 6,
+                message: "Password must be at least 6 characters",
+              },
+            })}
+          />
 
           <div className="auth-actions">
             <Link to="/forgot-password" className="forgot-password-link">
-              Forgot password?
+              ¿Ha olvidado su contraseña?
             </Link>
           </div>
 
-          <button
-            type="submit"
-            className={`md-button md-button-filled auth-submit-button ${
-              isLoading ? "loading" : ""
-            }`}
-            disabled={isLoading}
-          >
-            {isLoading ? "Signing in..." : "Sign in"}
-          </button>
+          <Button type="submit" size="large" fullWidth disabled={isLoading}>
+            {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
+          </Button>
         </form>
 
         {/* Remove the auth-footer section that had the "Sign up" link */}
         <div className="auth-footer">
           <p className="md-typescale-body-small auth-note">
-            Contact your administrator if you need an account.
+            Póngase en contacto con su administrador si necesita una cuenta.
           </p>
         </div>
       </div>

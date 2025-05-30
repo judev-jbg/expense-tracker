@@ -12,19 +12,21 @@
   align-items: center;
   justify-content: space-between;
   height: 64px;
-  padding: 0 16px;
+  padding: 0 24px;
   background: var(--md-sys-color-surface);
   color: var(--md-sys-color-on-surface);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 200;
   box-shadow: var(--md-sys-elevation-level1);
 }
 
-.md-top-app-bar-title {
-  flex: 1;
-  margin: 0;
-  font-weight: 500;
+.logo h1 {
+  display: none;
+}
+
+.logo-app {
+  width: 35px;
 }
 
 .top-app-bar-actions {
@@ -37,6 +39,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-right: 1rem;
   width: 40px;
   height: 40px;
   border: none;
@@ -238,15 +241,23 @@
 }
 
 .md-navigation-item.active::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 32px;
-  height: 3px;
+  width: 40px;
+  height: 2px;
   background: var(--md-sys-color-primary);
   border-radius: 0 0 3px 3px;
+}
+
+.md-navigation-item.active .md-navigation-icon::after {
+  opacity: 1;
+}
+.md-navigation-item.active .md-navigation-icon > svg {
+  color: var(--md-sys-color-on-secondary-container);
+  z-index: 10;
 }
 
 .md-navigation-icon {
@@ -259,35 +270,83 @@
   justify-content: center;
 }
 
+.md-navigation-icon::after {
+  content: "";
+  position: absolute;
+  width: 50%;
+  height: 30%;
+  opacity: 0;
+  transition-duration: 0.2s;
+  transition-property: transform, opacity;
+  transition-timing-function: linear;
+  border-radius: 100px;
+  background: var(--md-sys-color-secondary-container);
+  z-index: 0;
+}
+
 .md-navigation-label {
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 400;
   text-align: center;
+}
+
+.md-navigation-item.active .md-navigation-label {
+  font-weight: 500;
 }
 
 /* Tablet and Desktop Layout */
 @media (min-width: 768px) {
+  .logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .logo-app {
+    width: 35px;
+  }
+  .logo h1 {
+    display: block;
+    margin-left: 1rem;
+    font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      system-ui, sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.04rem;
+  }
+  .md-top-app-bar {
+    padding-right: 24px;
+    padding-left: 40px;
+  }
   .md-navigation-bar {
     position: fixed;
     left: 0;
     top: 0;
     bottom: 0;
-    width: 240px;
+    width: 250px;
     height: 100vh;
     flex-direction: column;
     border-top: none;
     border-right: 1px solid var(--md-sys-color-outline-variant);
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-    padding-top: 16px;
+    padding-top: 36px;
+    margin-top: 64px;
   }
 
   .md-navigation-item {
+    flex: 0.08;
     height: 56px;
     flex-direction: row;
     justify-content: flex-start;
     padding: 0 16px;
-    margin: 4px 8px;
-    border-radius: 28px;
+    margin: 8px 14px;
+    border-radius: 40px;
+    -webkit-border-radius: 40px;
+    -moz-border-radius: 40px;
+    -ms-border-radius: 40px;
+    -o-border-radius: 40px;
+  }
+  .md-navigation-item.active .md-navigation-icon::after {
+    opacity: 0;
   }
 
   .md-navigation-item.active::before {
@@ -306,16 +365,13 @@
   }
 
   .md-navigation-label {
+    font-size: 0.9rem;
     text-align: left;
   }
 
   .main-content {
     margin-left: 240px;
     padding-bottom: 0;
-  }
-
-  .md-top-app-bar {
-    margin-left: 240px;
   }
 
   .page-content {
@@ -329,19 +385,6 @@
     max-width: 1024px;
     padding: 32px;
   }
-}
-
-/* Focus States */
-.top-app-bar-action-button:focus,
-.user-avatar-button:focus,
-.user-menu-item:focus {
-  outline: 2px solid var(--md-sys-color-primary);
-  outline-offset: 2px;
-}
-
-.md-navigation-item:focus {
-  outline: 2px solid var(--md-sys-color-primary);
-  outline-offset: -2px;
 }
 
 /* High Contrast Mode */
@@ -376,4 +419,8 @@
   .user-avatar-button:active {
     transform: none;
   }
+}
+
+.spinner {
+  color: var(--md-sys-color-primary); /* Esto cambiará el color del SVG */
 }

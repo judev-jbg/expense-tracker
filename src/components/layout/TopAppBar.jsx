@@ -1,4 +1,6 @@
 import { useRef, useEffect } from "react";
+import { MdSunny } from "react-icons/md";
+import { RiMoonFill } from "react-icons/ri";
 
 const TopAppBar = ({
   title,
@@ -46,7 +48,14 @@ const TopAppBar = ({
   return (
     <header className="md-top-app-bar">
       {/* App Title */}
-      <h1 className="md-top-app-bar-title md-typescale-title-large">{title}</h1>
+      <div className="logo">
+        <img
+          src="/icon-512x512.png"
+          alt="Toolstock Logo"
+          className="logo-app"
+        />
+        <h1>Expense Traker</h1>
+      </div>
 
       {/* Actions */}
       <div className="top-app-bar-actions">
@@ -57,7 +66,9 @@ const TopAppBar = ({
           aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
           title={`${theme === "light" ? "Dark" : "Light"} theme`}
         >
-          <span className="action-icon">{theme === "light" ? "🌙" : "☀️"}</span>
+          <span className="action-icon">
+            {theme === "light" ? <RiMoonFill /> : <MdSunny />}
+          </span>
         </button>
 
         {/* User Menu */}

@@ -41,7 +41,7 @@ const PeriodSelector = ({ selectedYear, selectedMonth, onPeriodChange }) => {
       const month = months.find((m) => m.value === selectedMonth);
       return `${month.name} ${selectedYear}`;
     }
-    return `${selectedYear} (Full Year)`;
+    return `${selectedYear} (Año completo)`;
   };
 
   return (

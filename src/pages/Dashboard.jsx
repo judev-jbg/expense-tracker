@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { expenseTypesService, dashboardService } from "../libs/configService";
+import { dashboardService } from "../libs/configService";
 import DashboardSummary from "../components/dashboard/DashboardSummary";
 import ExpenseChart from "../components/dashboard/ExpenseChart";
 import CategoryBreakdown from "../components/dashboard/CategoryBreakdown";
@@ -8,6 +8,7 @@ import RecentExpenses from "../components/dashboard/RecentExpenses";
 import MonthlyTrend from "../components/dashboard/MonthlyTrend";
 import InsightsWidget from "../components/dashboard/InsightsWidget";
 import PeriodSelector from "../components/dashboard/PeriodSelector";
+import Spinner from "../components/common/Spinner";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -87,7 +88,9 @@ const Dashboard = () => {
     return (
       <div className="dashboard-loading">
         <div className="loading-container">
-          <div className="loading-spinner">Loading dashboard...</div>
+          <div className="loading-spinner">
+            <Spinner />
+          </div>
         </div>
       </div>
     );
@@ -120,13 +123,14 @@ const Dashboard = () => {
       <div className="dashboard-empty">
         <div className="empty-dashboard md-card">
           <div className="empty-icon">📊</div>
-          <h2 className="md-typescale-headline-small">No Data Yet</h2>
+          <h2 className="md-typescale-headline-small">Aún no hay datos</h2>
           <p className="md-typescale-body-medium">
-            Start adding expenses to see your financial dashboard come to life.
+            Empieza a añadir gastos para ver cómo cobra vida tu cuadro de mandos
+            financiero.
           </p>
           <div className="empty-actions">
             <a href="/expenses" className="md-button md-button-filled">
-              Add Your First Expense
+              Añada su primer gasto
             </a>
           </div>
         </div>
@@ -148,8 +152,8 @@ const Dashboard = () => {
         <div className="header-content">
           <h1 className="md-typescale-headline-medium">Dashboard</h1>
           <p className="md-typescale-body-medium dashboard-subtitle">
-            Welcome back, {user?.user_metadata?.first_name || "User"}! Here's
-            your spending overview.
+            Bienvenido, {user?.user_metadata?.first_name || "User"}! Aquí tienes
+            tu resumen de gastos.
           </p>
         </div>
 
@@ -218,7 +222,7 @@ const Dashboard = () => {
           {dashboardData.byEntity.length > 0 && (
             <div className="widget md-card">
               <h3 className="md-typescale-title-medium widget-title">
-                Top Spending Places
+                Lugares donde más se gasta
               </h3>
               <div className="entity-list">
                 {dashboardData.byEntity.slice(0, 5).map((entity, index) => (
@@ -229,8 +233,7 @@ const Dashboard = () => {
                         {entity.name}
                       </span>
                       <span className="entity-amount md-typescale-body-small">
-                        {formatCurrency(entity.amount)} ({entity.count}{" "}
-                        expenses)
+                        {formatCurrency(entity.amount)} ({entity.count} gastos)
                       </span>
                     </div>
                     <div className="entity-percentage">

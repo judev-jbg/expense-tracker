@@ -23,7 +23,13 @@ import Settings from "./pages/Settings";
 const LoadingScreen = () => (
   <div className="loading-container">
     <div className="loading-spinner">
-      <div className="md-typescale-body-large">Loading...</div>
+      <div className="md-typescale-body-large">
+        <img
+          src="/icon-512x512.png"
+          alt="Toolstock Logo"
+          className="spinner-logo"
+        />
+      </div>
     </div>
   </div>
 );

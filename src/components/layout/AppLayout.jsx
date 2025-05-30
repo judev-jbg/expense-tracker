@@ -60,14 +60,6 @@ const AppLayout = ({ children }) => {
 
       {/* Bottom Navigation */}
       <BottomNavigation currentPath={location.pathname} />
-
-      {/* User Menu Overlay (for mobile) */}
-      {isUserMenuOpen && (
-        <div
-          className="user-menu-overlay"
-          onClick={() => setIsUserMenuOpen(false)}
-        />
-      )}
     </div>
   );
 };

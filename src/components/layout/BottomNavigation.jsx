@@ -1,24 +1,27 @@
 import { Link } from "react-router-dom";
+import { RiDashboardLine, RiDashboardFill } from "react-icons/ri";
+import { HiOutlineCreditCard, HiCreditCard } from "react-icons/hi2";
+import { AiFillSetting, AiOutlineSetting } from "react-icons/ai";
 
 const BottomNavigation = ({ currentPath }) => {
   const navigationItems = [
     {
       path: "/dashboard",
       label: "Dashboard",
-      icon: "📊",
-      activeIcon: "📈",
+      icon: <RiDashboardLine />,
+      activeIcon: <RiDashboardFill />,
     },
     {
       path: "/expenses",
       label: "Expenses",
-      icon: "💳",
-      activeIcon: "💰",
+      icon: <HiOutlineCreditCard />,
+      activeIcon: <HiCreditCard />,
     },
     {
       path: "/settings",
       label: "Settings",
-      icon: "⚙️",
-      activeIcon: "🔧",
+      icon: <AiOutlineSetting />,
+      activeIcon: <AiFillSetting />,
     },
   ];
 
@@ -41,7 +44,7 @@ const BottomNavigation = ({ currentPath }) => {
             <span className="md-navigation-icon" aria-hidden="true">
               {isActive ? item.activeIcon : item.icon}
             </span>
-            <span className="md-navigation-label md-typescale-label-medium">
+            <span className="md-navigation-label md-typescale-label-large">
               {item.label}
             </span>
           </Link>

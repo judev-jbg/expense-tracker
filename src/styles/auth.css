@@ -73,10 +73,18 @@
 .auth-card-header {
   text-align: center;
   margin-bottom: 32px;
+  position: relative;
+}
+.login-logo {
+  position: absolute;
+  left: 40%;
+  top: -120%;
+  width: 60px;
 }
 
-.auth-card-header h3 {
+.auth-card-header h1 {
   color: var(--md-sys-color-on-surface);
+  margin-top: 8px;
   margin-bottom: 8px;
 }
 
@@ -126,16 +134,6 @@
   border-radius: 4px;
 }
 
-/* Form Field Error State */
-.md-text-field-input.error {
-  border-color: var(--md-sys-color-error);
-  background-color: rgba(207, 102, 121, 0.1);
-}
-
-.md-text-field-input.error:focus {
-  border-color: var(--md-sys-color-error);
-}
-
 /* Auth Actions */
 .auth-actions {
   display: flex;
@@ -175,7 +173,7 @@
 }
 
 .auth-submit-button.loading::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -251,7 +249,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -264,22 +263,23 @@
   .auth-container {
     padding: 12px;
   }
-  
+
   .auth-card {
     padding: 20px;
+    padding-top: 44px;
   }
-  
+
   .name-fields-row {
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
   .theme-toggle-button {
     width: 40px;
     height: 40px;
     font-size: 18px;
   }
-  
+
   .auth-logo h1 {
     font-size: 2.5rem;
   }
@@ -290,20 +290,22 @@
   .auth-container {
     padding: 32px;
   }
-  
+
   .auth-card {
     padding: 32px;
+    padding-top: 42px;
   }
-  
+
   .auth-header {
     margin-bottom: 48px;
+  }
+
+  .login-logo {
+    top: -130%;
   }
 }
 
 /* Focus Management */
-.auth-form input:focus {
-  outline: none;
-}
 
 .auth-form button:focus {
   outline: 2px solid var(--md-sys-color-primary);
@@ -315,11 +317,7 @@
   .auth-card {
     border: 2px solid var(--md-sys-color-outline);
   }
-  
-  .md-text-field-input {
-    border-width: 2px;
-  }
-  
+
   .theme-toggle-button {
     border-width: 2px;
   }
@@ -333,7 +331,7 @@
   .password-toggle-button {
     transition: none;
   }
-  
+
   .button-loading-spinner,
   .loading-spinner {
     animation: none;

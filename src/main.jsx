@@ -9,6 +9,8 @@ import "./styles/layout.css";
 import "./styles/settings.css";
 import "./styles/expenses.css";
 import "./styles/dashboard.css";
+import "./styles/input.css";
+import "./styles/button.css";
 
 // Create root and render app
 const container = document.getElementById("root");
