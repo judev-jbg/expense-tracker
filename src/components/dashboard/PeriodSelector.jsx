@@ -7,18 +7,18 @@ const PeriodSelector = ({ selectedYear, selectedMonth, onPeriodChange }) => {
   const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
   const months = [
-    { value: 1, name: "January", short: "Jan" },
+    { value: 1, name: "January", short: "Ene" },
     { value: 2, name: "February", short: "Feb" },
     { value: 3, name: "March", short: "Mar" },
-    { value: 4, name: "April", short: "Apr" },
+    { value: 4, name: "April", short: "Abr" },
     { value: 5, name: "May", short: "May" },
     { value: 6, name: "June", short: "Jun" },
     { value: 7, name: "July", short: "Jul" },
-    { value: 8, name: "August", short: "Aug" },
+    { value: 8, name: "August", short: "Ago" },
     { value: 9, name: "September", short: "Sep" },
     { value: 10, name: "October", short: "Oct" },
     { value: 11, name: "November", short: "Nov" },
-    { value: 12, name: "December", short: "Dec" },
+    { value: 12, name: "December", short: "Dic" },
   ];
 
   const handleYearChange = (year) => {
@@ -60,14 +60,14 @@ const PeriodSelector = ({ selectedYear, selectedMonth, onPeriodChange }) => {
           {/* Quick Actions */}
           <div className="period-section">
             <h4 className="period-section-title md-typescale-title-small">
-              Quick Select
+              Selección rapida
             </h4>
             <div className="quick-periods">
               <button
                 className={`period-option ${!selectedMonth ? "active" : ""}`}
                 onClick={handleShowFullYear}
               >
-                Full Year {selectedYear}
+                Año {selectedYear}
               </button>
               <button
                 className={`period-option ${
@@ -75,7 +75,7 @@ const PeriodSelector = ({ selectedYear, selectedMonth, onPeriodChange }) => {
                 }`}
                 onClick={() => handleMonthChange(new Date().getMonth() + 1)}
               >
-                This Month
+                Este mes
               </button>
               <button
                 className={`period-option ${
@@ -83,7 +83,7 @@ const PeriodSelector = ({ selectedYear, selectedMonth, onPeriodChange }) => {
                 }`}
                 onClick={() => handleMonthChange(new Date().getMonth())}
               >
-                Last Month
+                Ultimo mes
               </button>
             </div>
           </div>

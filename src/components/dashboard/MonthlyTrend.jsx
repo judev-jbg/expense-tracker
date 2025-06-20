@@ -10,7 +10,7 @@ const MonthlyTrend = ({ data, year, formatCurrency }) => {
     <div className="monthly-trend widget md-card">
       <div className="widget-header">
         <h3 className="md-typescale-title-medium widget-title">
-          Monthly Overview {year}
+          Resumen mensual - {year}
         </h3>
         <div className="trend-summary">
           <span className="trend-total md-typescale-title-small">

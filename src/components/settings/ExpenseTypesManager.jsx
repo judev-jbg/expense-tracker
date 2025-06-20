@@ -3,6 +3,8 @@ import { useForm } from "react-hook-form";
 import { expenseTypesService } from "../../libs/configService";
 import ExpenseTypeForm from "./ExpenseTypeForm";
 import ExpenseTypeCard from "./ExpenseTypeCard";
+import Spinner from "../common/Spinner";
+import Button from "../common/Button";
 
 const ExpenseTypesManager = () => {
   const [expenseTypes, setExpenseTypes] = useState([]);
@@ -86,7 +88,9 @@ const ExpenseTypesManager = () => {
   if (loading) {
     return (
       <div className="loading-container">
-        <div className="loading-spinner">Loading expense types...</div>
+        <div className="loading-spinner">
+          <Spinner />
+        </div>
       </div>
     );
   }
@@ -95,21 +99,16 @@ const ExpenseTypesManager = () => {
     <div className="expense-types-manager">
       <div className="section-header">
         <div className="section-title">
-          <h2 className="md-typescale-headline-small">Expense Types</h2>
+          <h2 className="md-typescale-headline-small">Tipos de gasto</h2>
           <p className="md-typescale-body-medium section-description">
-            Create and manage categories for your expenses like Food, Transport,
-            Utilities, etc.
+            Cree y gestione categorías para sus gastos como Comida, Transporte,
+            Servicios públicos, etc.
           </p>
         </div>
 
-        <button
-          className="md-button md-button-filled"
-          onClick={() => setShowForm(true)}
-          disabled={showForm}
-        >
-          <span className="button-icon">➕</span>
-          Add Type
-        </button>
+        <Button onClick={() => setShowForm(true)} disabled={showForm}>
+          Agregar gasto
+        </Button>
       </div>
 
       {error && (
@@ -132,9 +131,11 @@ const ExpenseTypesManager = () => {
         {expenseTypes.length === 0 ? (
           <div className="empty-state md-card">
             <div className="empty-icon">🏷️</div>
-            <h3 className="md-typescale-title-medium">No expense types yet</h3>
+            <h3 className="md-typescale-title-medium">
+              Aún no hay tipos de gastos
+            </h3>
             <p className="md-typescale-body-medium">
-              Create your first expense type to start organizing your expenses.
+              Crea tu primer tipo de gasto para empezar a organizar tus gastos.
             </p>
           </div>
         ) : (

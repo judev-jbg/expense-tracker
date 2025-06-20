@@ -13,13 +13,13 @@ const BottomNavigation = ({ currentPath }) => {
     },
     {
       path: "/expenses",
-      label: "Expenses",
+      label: "Gastos",
       icon: <HiOutlineCreditCard />,
       activeIcon: <HiCreditCard />,
     },
     {
       path: "/settings",
-      label: "Settings",
+      label: "Configuración",
       icon: <AiOutlineSetting />,
       activeIcon: <AiFillSetting />,
     },

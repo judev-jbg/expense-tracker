@@ -6,7 +6,7 @@ const ExpenseChart = ({ data, period, formatCurrency }) => {
     if (period === "month") {
       return date.getDate().toString();
     } else {
-      return date.toLocaleDateString("en-US", {
+      return date.toLocaleDateString("es-ES", {
         month: "short",
         day: "numeric",
       });
@@ -37,12 +37,12 @@ const ExpenseChart = ({ data, period, formatCurrency }) => {
     return (
       <div className="widget md-card">
         <h3 className="md-typescale-title-medium widget-title">
-          Spending Trend
+          Tendencia del gasto
         </h3>
         <div className="empty-chart">
           <div className="empty-icon">📈</div>
           <p className="md-typescale-body-medium">
-            No data available for chart
+            No hay datos disponibles para el gráfico
           </p>
         </div>
       </div>
@@ -53,14 +53,14 @@ const ExpenseChart = ({ data, period, formatCurrency }) => {
     <div className="expense-chart widget md-card">
       <div className="widget-header">
         <h3 className="md-typescale-title-medium widget-title">
-          Spending Trend
+          Tendencia del gasto
         </h3>
         <div className="chart-summary">
           <span className="chart-total md-typescale-title-small">
             {formatCurrency(totalAmount)}
           </span>
           <span className="chart-period md-typescale-body-small">
-            {chartData.length} {chartData.length === 1 ? "day" : "days"}
+            {chartData.length} {chartData.length === 1 ? "dia" : "dias"}
           </span>
         </div>
       </div>

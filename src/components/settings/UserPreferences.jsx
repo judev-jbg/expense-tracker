@@ -6,6 +6,11 @@ import {
   userPreferencesService,
   expenseTypesService,
 } from "../../libs/configService";
+import Spinner from "../common/Spinner";
+import Button from "../common/Button";
+import { MdEmail, MdCheck } from "react-icons/md";
+import { FaBell } from "react-icons/fa6";
+import { IoWarning } from "react-icons/io5";
 
 const UserPreferences = () => {
   const { user } = useAuth();
@@ -141,7 +146,9 @@ const UserPreferences = () => {
   if (loading) {
     return (
       <div className="loading-container">
-        <div className="loading-spinner">Loading preferences...</div>
+        <div className="loading-spinner">
+          <Spinner />
+        </div>
       </div>
     );
   }
@@ -150,23 +157,29 @@ const UserPreferences = () => {
     <div className="user-preferences">
       <div className="section-header">
         <div className="section-title">
-          <h2 className="md-typescale-headline-small">User Preferences</h2>
+          <h2 className="md-typescale-headline-small">
+            Preferencias del usuario
+          </h2>
           <p className="md-typescale-body-medium section-description">
-            Customize your experience and default settings.
+            Personaliza tu experiencia y la configuración por defecto
           </p>
         </div>
       </div>
 
       {error && (
         <div className="error-message md-card">
-          <span className="error-icon">⚠️</span>
+          <span className="error-icon">
+            <IoWarning />
+          </span>
           <span className="md-typescale-body-medium">{error}</span>
         </div>
       )}
 
       {success && (
         <div className="success-message md-card">
-          <span className="success-icon">✅</span>
+          <span className="success-icon">
+            <MdCheck />
+          </span>
           <span className="md-typescale-body-medium">{success}</span>
         </div>
       )}
@@ -175,7 +188,7 @@ const UserPreferences = () => {
         {/* User Information */}
         <div className="preferences-section md-card">
           <h3 className="md-typescale-title-medium section-title">
-            Account Information
+            Información sobre la cuenta
           </h3>
 
           <div className="user-info-display">
@@ -196,7 +209,7 @@ const UserPreferences = () => {
                 {user?.email}
               </p>
               <p className="md-typescale-body-small">
-                Member since {new Date(user?.created_at).toLocaleDateString()}
+                Miembro desde {new Date(user?.created_at).toLocaleDateString()}
               </p>
             </div>
           </div>
@@ -205,13 +218,13 @@ const UserPreferences = () => {
         {/* Appearance Settings */}
         <div className="preferences-section md-card">
           <h3 className="md-typescale-title-medium section-title">
-            Appearance
+            Apariencia
           </h3>
 
           <div className="form-row">
             <div className="md-text-field">
               <label htmlFor="theme" className="md-text-field-label">
-                Theme
+                Tema
               </label>
               <select
                 id="theme"
@@ -219,8 +232,8 @@ const UserPreferences = () => {
                 {...register("theme")}
                 disabled={saving}
               >
-                <option value="dark">🌙 Dark Theme</option>
-                <option value="light">☀️ Light Theme</option>
+                <option value="dark">Oscuro</option>
+                <option value="light">Claro</option>
               </select>
             </div>
           </div>
@@ -229,13 +242,13 @@ const UserPreferences = () => {
         {/* Regional Settings */}
         <div className="preferences-section md-card">
           <h3 className="md-typescale-title-medium section-title">
-            Regional Settings
+            Ajustes regionales
           </h3>
 
           <div className="form-row form-row-split">
             <div className="md-text-field">
               <label htmlFor="currency" className="md-text-field-label">
-                Currency
+                Moneda
               </label>
               <select
                 id="currency"
@@ -253,7 +266,7 @@ const UserPreferences = () => {
 
             <div className="md-text-field">
               <label htmlFor="date_format" className="md-text-field-label">
-                Date Format
+                Formato de fecha
               </label>
               <select
                 id="date_format"
@@ -274,7 +287,7 @@ const UserPreferences = () => {
         {/* Default Settings */}
         <div className="preferences-section md-card">
           <h3 className="md-typescale-title-medium section-title">
-            Default Settings
+            Ajustes por defecto
           </h3>
 
           <div className="form-row">
@@ -283,7 +296,7 @@ const UserPreferences = () => {
                 htmlFor="default_expense_type_id"
                 className="md-text-field-label"
               >
-                Default Expense Type
+                Tipo de gasto por defecto
               </label>
               <select
                 id="default_expense_type_id"
@@ -291,7 +304,7 @@ const UserPreferences = () => {
                 {...register("default_expense_type_id")}
                 disabled={saving}
               >
-                <option value="">None (manual selection)</option>
+                <option value="">Ninguno (seleccion manual)</option>
                 {expenseTypes.map((type) => (
                   <option key={type.id} value={type.id}>
                     {type.icon} {type.name}
@@ -299,7 +312,7 @@ const UserPreferences = () => {
                 ))}
               </select>
               <span className="md-typescale-body-small field-help">
-                Pre-select this expense type when creating new expenses
+                Preseleccionar este tipo de gasto al crear nuevos gastos
               </span>
             </div>
           </div>
@@ -308,7 +321,7 @@ const UserPreferences = () => {
         {/* Notification Settings */}
         <div className="preferences-section md-card">
           <h3 className="md-typescale-title-medium section-title">
-            Notifications
+            Notificaciones
           </h3>
 
           <div className="checkbox-group">
@@ -320,10 +333,11 @@ const UserPreferences = () => {
                 disabled={saving}
               />
               <span className="checkbox-label md-typescale-body-medium">
-                📧 Email notifications
+                <MdEmail /> Notificaciones por correo electrónico
               </span>
               <span className="checkbox-description md-typescale-body-small">
-                Receive email updates about your account and expenses
+                Reciba por correo electrónico información actualizada sobre su
+                cuenta y sus gastos
               </span>
             </label>
 
@@ -335,10 +349,11 @@ const UserPreferences = () => {
                 disabled={saving}
               />
               <span className="checkbox-label md-typescale-body-medium">
-                🔔 Push notifications
+                <FaBell /> Notificaciones push
               </span>
               <span className="checkbox-description md-typescale-body-small">
-                Receive browser notifications for important updates
+                Reciba notificaciones del navegador sobre actualizaciones
+                importantes
               </span>
             </label>
           </div>
@@ -346,15 +361,13 @@ const UserPreferences = () => {
 
         {/* Save Button */}
         <div className="form-actions">
-          <button
+          <Button
             type="submit"
-            className={`md-button md-button-filled save-preferences-button ${
-              saving ? "loading" : ""
-            }`}
             disabled={saving}
+            className={`${saving ? "loading" : ""}`}
           >
-            {saving ? "Saving..." : "Save Preferences"}
-          </button>
+            {saving ? "Guardando..." : "Guardar preferencias"}
+          </Button>
         </div>
       </form>
     </div>

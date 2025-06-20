@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ExpenseCard from "./ExpenseCard";
+import Spinner from "../common/Spinner";
 
 const ExpensesList = ({ expenses, onEdit, onDelete, onView, loading }) => {
   const [sortBy, setSortBy] = useState("date");
@@ -43,7 +44,7 @@ const ExpensesList = ({ expenses, onEdit, onDelete, onView, loading }) => {
       2,
       "0"
     )}`;
-    const monthName = date.toLocaleDateString("en-US", {
+    const monthName = date.toLocaleDateString("es-ES", {
       year: "numeric",
       month: "long",
     });
@@ -73,7 +74,9 @@ const ExpensesList = ({ expenses, onEdit, onDelete, onView, loading }) => {
   if (loading) {
     return (
       <div className="expenses-loading">
-        <div className="loading-spinner">Loading expenses...</div>
+        <div className="loading-spinner">
+          <Spinner />
+        </div>
       </div>
     );
   }
@@ -82,9 +85,9 @@ const ExpensesList = ({ expenses, onEdit, onDelete, onView, loading }) => {
     return (
       <div className="empty-expenses md-card">
         <div className="empty-icon">💸</div>
-        <h3 className="md-typescale-title-medium">No expenses found</h3>
+        <h3 className="md-typescale-title-medium">No hay gastos</h3>
         <p className="md-typescale-body-medium">
-          Start tracking your expenses by adding your first one.
+          Empieza a controlar tus gastos añadiendo el primero.
         </p>
       </div>
     );
@@ -95,13 +98,13 @@ const ExpensesList = ({ expenses, onEdit, onDelete, onView, loading }) => {
       {/* Sort Controls */}
       <div className="list-controls md-card">
         <div className="sort-controls">
-          <span className="md-typescale-body-small">Sort by:</span>
+          <span className="md-typescale-body-small">Ordernar por:</span>
           <div className="sort-buttons">
             {[
-              { key: "date", label: "Date" },
-              { key: "amount", label: "Amount" },
-              { key: "type", label: "Type" },
-              { key: "entity", label: "Entity" },
+              { key: "date", label: "Fecha" },
+              { key: "amount", label: "Importe" },
+              { key: "type", label: "Tipo" },
+              { key: "entity", label: "Entidad" },
             ].map(({ key, label }) => (
               <button
                 key={key}
@@ -121,7 +124,7 @@ const ExpensesList = ({ expenses, onEdit, onDelete, onView, loading }) => {
 
         <div className="list-summary">
           <span className="md-typescale-body-small">
-            {expenses.length} {expenses.length === 1 ? "expense" : "expenses"}
+            {expenses.length} {expenses.length === 1 ? "gasto" : "gastos"}
           </span>
         </div>
       </div>
@@ -140,7 +143,7 @@ const ExpensesList = ({ expenses, onEdit, onDelete, onView, loading }) => {
                 </span>
                 <span className="group-count md-typescale-body-small">
                   {group.expenses.length}{" "}
-                  {group.expenses.length === 1 ? "expense" : "expenses"}
+                  {group.expenses.length === 1 ? "gasto" : "gastos"}
                 </span>
               </div>
             </div>

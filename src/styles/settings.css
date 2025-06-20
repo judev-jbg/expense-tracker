@@ -58,6 +58,15 @@
   text-align: center;
 }
 
+.settings-nav-icon svg {
+  color: var(--md-sys-color-on-surface-variant);
+  opacity: 0.8;
+}
+
+.settings-nav-item.active .settings-nav-icon svg {
+  color: var(--md-sys-color-on-primary-container);
+}
+
 .settings-nav-content {
   flex: 1;
   display: flex;
@@ -66,7 +75,10 @@
 }
 
 .settings-nav-title {
+  display: flex;
+  align-items: center;
   margin: 0;
+  color: var(--md-sys-color-on-surface);
 }
 
 .settings-nav-description {
@@ -198,6 +210,11 @@
 .card-menu-button.delete-button:hover {
   background: var(--md-sys-color-error);
   color: var(--md-sys-color-on-error);
+}
+
+.card-menu-button svg {
+  width: 1.2rem;
+  height: 1.2rem;
 }
 
 .card-content {
@@ -332,15 +349,21 @@
   height: 40px;
   border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: 8px;
-  background: var(--md-sys-color-surface);
+  background: var(--md-sys-color-primary-container);
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 16px;
 }
 
 .icon-option:hover {
-  background: var(--md-sys-color-primary-container);
-  border-color: var(--md-sys-color-primary);
+  background: var(--md-sys-color-primary);
+}
+
+.icon-option svg {
+  color: var(--md-sys-color-on-primary-container);
+}
+.icon-option:hover svg {
+  color: var(--md-sys-color-on-primary);
 }
 
 /* Form Actions */
@@ -494,6 +517,8 @@
 }
 
 .contact-icon {
+  display: flex;
+  align-items: center;
   font-size: 14px;
   width: 18px;
   text-align: center;
@@ -619,6 +644,10 @@
   font-weight: 500;
   color: var(--md-sys-color-on-surface);
   margin-bottom: 4px;
+}
+
+.checkbox-label svg {
+  color: var(--md-sys-color-on-secondary-container);
 }
 
 .checkbox-description {
@@ -1016,11 +1045,15 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 8px;
-  border-radius: 12px;
+  padding: 4px 12px;
+  border-radius: 40px;
   color: white;
   font-size: 0.75rem;
   font-weight: 500;
+  -webkit-border-radius: 40px;
+  -moz-border-radius: 40px;
+  -ms-border-radius: 40px;
+  -o-border-radius: 40px;
 }
 
 .role-icon {
@@ -1173,13 +1206,21 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
+  padding: 8px 10px;
   background: var(--md-sys-color-surface-variant);
   border-radius: 12px;
 }
 
 .preference-icon {
+  display: flex;
+  align-items: center;
   font-size: 12px;
+}
+
+.preference-icon svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  opacity: 0.8;
 }
 
 .preference-text {
@@ -1204,13 +1245,14 @@
   gap: 2px;
 }
 
-.date-label {
+.user-card-footer .date-label {
   color: var(--md-sys-color-on-surface-variant);
   font-weight: 500;
 }
 
-.date-value {
-  color: var(--md-sys-color-on-surface);
+.user-card-footer .date-value {
+  color: var(--md-sys-color-on-surface-variant);
+  opacity: 0.6;
 }
 
 /* =====================================================
@@ -1302,11 +1344,15 @@
 .admin-badge {
   background: var(--md-sys-color-error);
   color: var(--md-sys-color-on-error);
-  padding: 2px 6px;
-  border-radius: 6px;
+  padding: 2px 8px;
+  border-radius: 40px;
   font-size: 0.625rem;
   font-weight: 500;
   margin-left: 8px;
+  -webkit-border-radius: 40px;
+  -moz-border-radius: 40px;
+  -ms-border-radius: 40px;
+  -o-border-radius: 40px;
 }
 
 /* =====================================================
@@ -1338,8 +1384,8 @@
   }
 
   .user-actions-dropdown {
-    right: auto;
-    left: 0;
+    right: 0;
+    left: auto;
     min-width: 140px;
   }
 }

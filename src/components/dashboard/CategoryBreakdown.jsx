@@ -3,11 +3,13 @@ const CategoryBreakdown = ({ data, formatCurrency }) => {
     return (
       <div className="widget md-card">
         <h3 className="md-typescale-title-medium widget-title">
-          Spending by Category
+          Gasto por categoría
         </h3>
         <div className="empty-widget">
           <div className="empty-icon">🏷️</div>
-          <p className="md-typescale-body-medium">No categories to display</p>
+          <p className="md-typescale-body-medium">
+            No hay categorías que mostrar
+          </p>
         </div>
       </div>
     );
@@ -19,7 +21,7 @@ const CategoryBreakdown = ({ data, formatCurrency }) => {
     <div className="category-breakdown widget md-card">
       <div className="widget-header">
         <h3 className="md-typescale-title-medium widget-title">
-          Spending by Category
+          Gasto por categoría
         </h3>
         <span className="widget-total md-typescale-title-small">
           {formatCurrency(totalAmount)}
@@ -42,8 +44,7 @@ const CategoryBreakdown = ({ data, formatCurrency }) => {
                     {category.name}
                   </span>
                   <span className="category-count md-typescale-body-small">
-                    {category.count}{" "}
-                    {category.count === 1 ? "expense" : "expenses"}
+                    {category.count} {category.count === 1 ? "gasto" : "gastos"}
                   </span>
                 </div>
               </div>

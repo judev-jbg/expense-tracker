@@ -21,7 +21,7 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("es-ES", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -30,15 +30,14 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
   };
 
   const formatDateTime = (dateString) => {
-    return new Date(dateString).toLocaleString("en-US", {
+    return new Date(dateString).toLocaleString("es-ES", {
       dateStyle: "medium",
       timeStyle: "short",
     });
   };
 
   const handleDocumentClick = (document) => {
-    // Open document in new tab
-    window.open(document.google_drive_url, "_blank", "noopener,noreferrer");
+    // Open document in new tab - TODO
   };
 
   const getFileIcon = (mimeType) => {
@@ -68,7 +67,7 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
         {/* Header */}
         <div className="details-header">
           <div className="header-main">
-            <h2 className="md-typescale-headline-small">Expense Details</h2>
+            <h2 className="md-typescale-headline-small">Detalle del gasto</h2>
             <button
               className="close-button"
               onClick={onClose}
@@ -84,14 +83,14 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
               onClick={() => onEdit(expense)}
             >
               <span className="button-icon">✏️</span>
-              Edit
+              Editar
             </button>
             <button
               className="md-button md-button-filled delete-button"
               onClick={() => setShowDeleteConfirm(true)}
             >
               <span className="button-icon">🗑️</span>
-              Delete
+              Eliminar
             </button>
           </div>
         </div>
@@ -102,7 +101,7 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
           <div className="details-summary">
             <div className="amount-section">
               <span className="amount-label md-typescale-body-small">
-                Amount
+                Importe
               </span>
               <span className="amount-value md-typescale-display-small">
                 {formatAmount(expense.amount)}
@@ -110,7 +109,7 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
             </div>
 
             <div className="date-section">
-              <span className="date-label md-typescale-body-small">Date</span>
+              <span className="date-label md-typescale-body-small">Fecha</span>
               <span className="date-value md-typescale-title-large">
                 {formatDate(expense.expense_date)}
               </span>
@@ -120,7 +119,7 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
           {/* Type and Entity */}
           <div className="details-section">
             <h3 className="md-typescale-title-medium section-title">
-              Category & Entity
+              Categoria y Entidad
             </h3>
 
             <div className="category-info">
@@ -138,7 +137,7 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
                     {expense.expense_types.name}
                   </span>
                   <span className="category-type md-typescale-body-small">
-                    Expense Type
+                    Tipo de Gasto
                   </span>
                 </div>
               </div>
@@ -152,7 +151,7 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
                     {expense.entities.name}
                   </span>
                   <span className="category-type md-typescale-body-small">
-                    Entity
+                    Entidad
                   </span>
                   {expense.entities.description && (
                     <span className="entity-description md-typescale-body-small">
@@ -168,7 +167,7 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
               Object.keys(expense.entities.contact_info).length > 0 && (
                 <div className="entity-contact">
                   <h4 className="md-typescale-title-small">
-                    Contact Information
+                    Informacion de Contacto
                   </h4>
                   <div className="contact-grid">
                     {expense.entities.contact_info.phone && (
@@ -215,7 +214,7 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
           {expense.description && (
             <div className="details-section">
               <h3 className="md-typescale-title-medium section-title">
-                Description
+                Descripción
               </h3>
               <p className="md-typescale-body-large expense-description-text">
                 {expense.description}
@@ -226,7 +225,9 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
           {/* Tags */}
           {expense.tags && expense.tags.length > 0 && (
             <div className="details-section">
-              <h3 className="md-typescale-title-medium section-title">Tags</h3>
+              <h3 className="md-typescale-title-medium section-title">
+                Etiquetas
+              </h3>
               <div className="tags-container">
                 {expense.tags.map((tag, index) => (
                   <span key={index} className="tag-chip">
@@ -240,7 +241,7 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
           {/* Notes */}
           {expense.notes && (
             <div className="details-section">
-              <h3 className="md-typescale-title-medium section-title">Notes</h3>
+              <h3 className="md-typescale-title-medium section-title">Notas</h3>
               <div className="notes-content">
                 <p className="md-typescale-body-medium notes-text">
                   {expense.notes}
@@ -254,7 +255,7 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
             expense.expense_documents.length > 0 && (
               <div className="details-section">
                 <h3 className="md-typescale-title-medium section-title">
-                  Documents & Receipts
+                  Documentos y recibos
                 </h3>
                 <div className="documents-grid">
                   {expense.expense_documents.map((document) => (
@@ -307,7 +308,7 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
             <div className="metadata-grid">
               <div className="metadata-item">
                 <span className="metadata-label md-typescale-body-small">
-                  Created
+                  Creado
                 </span>
                 <span className="metadata-value md-typescale-body-medium">
                   {formatDateTime(expense.created_at)}
@@ -315,7 +316,7 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
               </div>
               <div className="metadata-item">
                 <span className="metadata-label md-typescale-body-small">
-                  Last Updated
+                  Ultima actualización
                 </span>
                 <span className="metadata-value md-typescale-body-medium">
                   {formatDateTime(expense.updated_at)}
@@ -323,7 +324,7 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
               </div>
               <div className="metadata-item">
                 <span className="metadata-label md-typescale-body-small">
-                  Period
+                  Periodo
                 </span>
                 <span className="metadata-value md-typescale-body-medium">
                   {expense.month}/{expense.year}
@@ -333,10 +334,10 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
                 expense.expense_documents.length > 0 && (
                   <div className="metadata-item">
                     <span className="metadata-label md-typescale-body-small">
-                      Attachments
+                      Adjuntos
                     </span>
                     <span className="metadata-value md-typescale-body-medium">
-                      {expense.expense_documents.length} file
+                      {expense.expense_documents.length} archivo
                       {expense.expense_documents.length !== 1 ? "s" : ""}
                     </span>
                   </div>
@@ -349,11 +350,11 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
         {showDeleteConfirm && (
           <div className="delete-confirmation-overlay">
             <div className="delete-confirmation-modal md-card">
-              <h3 className="md-typescale-title-medium">Delete Expense</h3>
+              <h3 className="md-typescale-title-medium">Eliminar gasto</h3>
               <p className="md-typescale-body-medium">
-                Are you sure you want to delete this expense of{" "}
-                {formatAmount(expense.amount)}? This action cannot be undone and
-                will also remove any attached documents.
+                ¿Está seguro de que desea eliminar este gasto de{" "}
+                {formatAmount(expense.amount)}? Esta acción no puede deshacerse
+                y también eliminará cualquier documento adjunto.
               </p>
               <div className="confirmation-actions">
                 <button
@@ -370,7 +371,7 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
                   onClick={handleDelete}
                   disabled={isDeleting}
                 >
-                  {isDeleting ? "Deleting..." : "Delete Expense"}
+                  {isDeleting ? "Elimnando..." : "Eliminar gasto"}
                 </button>
               </div>
             </div>

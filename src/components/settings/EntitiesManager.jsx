@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { entitiesService, expenseTypesService } from "../../libs/configService";
 import EntityForm from "./EntityForm";
 import EntityCard from "./EntityCard";
+import Spinner from "../common/Spinner";
+import Button from "../common/Button";
 
 const EntitiesManager = () => {
   const [entities, setEntities] = useState([]);
@@ -120,7 +122,9 @@ const EntitiesManager = () => {
   if (loading) {
     return (
       <div className="loading-container">
-        <div className="loading-spinner">Loading entities...</div>
+        <div className="loading-spinner">
+          <Spinner />
+        </div>
       </div>
     );
   }
@@ -129,21 +133,19 @@ const EntitiesManager = () => {
     <div className="entities-manager">
       <div className="section-header">
         <div className="section-title">
-          <h2 className="md-typescale-headline-small">Entities</h2>
+          <h2 className="md-typescale-headline-small">Entidades</h2>
           <p className="md-typescale-body-medium section-description">
-            Manage specific companies, stores, and service providers for each
-            expense type.
+            Gestione empresas, tiendas y proveedores de servicios específicos
+            para cada tipo de gasto.
           </p>
         </div>
 
-        <button
-          className="md-button md-button-filled"
+        <Button
           onClick={() => setShowForm(true)}
           disabled={showForm || expenseTypes.length === 0}
         >
-          <span className="button-icon">➕</span>
-          Add Entity
-        </button>
+          Agregar entidad
+        </Button>
       </div>
 
       {error && (
@@ -158,11 +160,12 @@ const EntitiesManager = () => {
           <span className="warning-icon">💡</span>
           <div>
             <span className="md-typescale-body-medium">
-              You need to create expense types first before adding entities.
+              Es necesario crear primero las clases de gastos antes de añadir
+              entidades.
             </span>
             <br />
             <span className="md-typescale-body-small">
-              Go to the Expense Types section to get started.
+              Vaya a la sección Tipos de gastos para empezar.
             </span>
           </div>
         </div>
@@ -173,7 +176,7 @@ const EntitiesManager = () => {
         <div className="entities-filter">
           <div className="md-text-field">
             <label htmlFor="filter-type" className="md-text-field-label">
-              Filter by Expense Type
+              Filtrar por tipo de gasto
             </label>
             <select
               id="filter-type"
@@ -181,7 +184,7 @@ const EntitiesManager = () => {
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
             >
-              <option value="">All Types</option>
+              <option value="">Todos</option>
               {expenseTypes.map((type) => (
                 <option key={type.id} value={type.id}>
                   {type.icon} {type.name}
@@ -206,9 +209,9 @@ const EntitiesManager = () => {
         {entities.length === 0 ? (
           <div className="empty-state md-card">
             <div className="empty-icon">🏢</div>
-            <h3 className="md-typescale-title-medium">No entities yet</h3>
+            <h3 className="md-typescale-title-medium">Aún no hay entidades</h3>
             <p className="md-typescale-body-medium">
-              Create your first entity to specify where you spend money.
+              Cree su primera entidad para especificar dónde gasta el dinero.
             </p>
           </div>
         ) : (
@@ -225,7 +228,7 @@ const EntitiesManager = () => {
                   <h3 className="md-typescale-title-medium">{type.name}</h3>
                   <span className="entity-count md-typescale-body-small">
                     {typeEntities.length}{" "}
-                    {typeEntities.length === 1 ? "entity" : "entities"}
+                    {typeEntities.length === 1 ? "entidad" : "entidades"}
                   </span>
                 </div>
 
@@ -243,7 +246,8 @@ const EntitiesManager = () => {
                 {typeEntities.length === 0 && !filterType && (
                   <div className="empty-type-state">
                     <p className="md-typescale-body-small">
-                      No entities for {type.name} yet. Add one to get started.
+                      No hay entidades para {type.name} todavía. Añade uno para
+                      empezar.
                     </p>
                   </div>
                 )}

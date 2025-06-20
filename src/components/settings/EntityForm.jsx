@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import Button from "../common/Button";
 
 const EntityForm = ({
   entity,
@@ -68,7 +69,7 @@ const EntityForm = ({
     <div className="entity-form md-card">
       <div className="form-header">
         <h3 className="md-typescale-title-large">
-          {isEditing ? "Edit Entity" : "New Entity"}
+          {isEditing ? "Editar Entidad" : "Nueva Entidad"}
         </h3>
       </div>
 
@@ -76,7 +77,7 @@ const EntityForm = ({
         <div className="form-row">
           <div className="md-text-field">
             <label htmlFor="expense_type_id" className="md-text-field-label">
-              Expense Type *
+              Tipo de gasto *
             </label>
             <select
               id="expense_type_id"
@@ -88,7 +89,7 @@ const EntityForm = ({
               })}
               disabled={isSubmitting}
             >
-              <option value="">Select expense type</option>
+              <option value="">Selecciona el tipo de gasto</option>
               {expenseTypes.map((type) => (
                 <option key={type.id} value={type.id}>
                   {type.icon} {type.name}
@@ -106,7 +107,7 @@ const EntityForm = ({
         <div className="form-row">
           <div className="md-text-field">
             <label htmlFor="name" className="md-text-field-label">
-              Name *
+              Nombre *
             </label>
             <input
               id="name"
@@ -135,19 +136,19 @@ const EntityForm = ({
         <div className="form-row">
           <div className="md-text-field">
             <label htmlFor="description" className="md-text-field-label">
-              Description
+              Descripción
             </label>
             <textarea
               id="description"
               className={`md-text-field-input ${
                 errors.description ? "error" : ""
               }`}
-              placeholder="Brief description of this entity"
+              placeholder="Breve descripción de esta entidad"
               rows="3"
               {...register("description", {
                 maxLength: {
                   value: 200,
-                  message: "Description must be less than 200 characters",
+                  message: "La descripción debe tener menos de 200 caracteres",
                 },
               })}
               disabled={isSubmitting}
@@ -163,13 +164,13 @@ const EntityForm = ({
         {/* Contact Information Section */}
         <div className="form-section">
           <h4 className="md-typescale-title-small section-title">
-            Contact Information (Optional)
+            Informacion de contacto (Opcional)
           </h4>
 
           <div className="form-row form-row-split">
             <div className="md-text-field">
               <label htmlFor="phone" className="md-text-field-label">
-                Phone
+                Telefono
               </label>
               <input
                 id="phone"
@@ -191,11 +192,11 @@ const EntityForm = ({
                 className={`md-text-field-input ${
                   errors.contact_info?.email ? "error" : ""
                 }`}
-                placeholder="contact@example.com"
+                placeholder="contacto@correo.com"
                 {...register("contact_info.email", {
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Invalid email address",
+                    message: "El email no es válido",
                   },
                 })}
                 disabled={isSubmitting}
@@ -211,7 +212,7 @@ const EntityForm = ({
           <div className="form-row">
             <div className="md-text-field">
               <label htmlFor="website" className="md-text-field-label">
-                Website
+                Sitio WEB
               </label>
               <input
                 id="website"
@@ -219,11 +220,11 @@ const EntityForm = ({
                 className={`md-text-field-input ${
                   errors.contact_info?.website ? "error" : ""
                 }`}
-                placeholder="https://example.com"
+                placeholder="https://misitio.com"
                 {...register("contact_info.website", {
                   pattern: {
                     value: /^https?:\/\/.+\..+/,
-                    message: "Invalid website URL",
+                    message: "La URL del sitio web no es válida",
                   },
                 })}
                 disabled={isSubmitting}
@@ -239,12 +240,12 @@ const EntityForm = ({
           <div className="form-row">
             <div className="md-text-field">
               <label htmlFor="address" className="md-text-field-label">
-                Address
+                Dirección
               </label>
               <textarea
                 id="address"
                 className="md-text-field-input"
-                placeholder="Street address, city, postal code"
+                placeholder="Calle, ciudad, código postal"
                 rows="2"
                 {...register("contact_info.address")}
                 disabled={isSubmitting}
@@ -260,23 +261,22 @@ const EntityForm = ({
             onClick={onCancel}
             disabled={isSubmitting}
           >
-            Cancel
+            Cancelar
           </button>
-          <button
+
+          <Button
             type="submit"
-            className={`md-button md-button-filled ${
-              isSubmitting ? "loading" : ""
-            }`}
+            className={`${isSubmitting ? "loading" : ""}`}
             disabled={isSubmitting}
           >
             {isSubmitting
               ? isEditing
-                ? "Updating..."
-                : "Creating..."
+                ? "Actualizando..."
+                : "Creando..."
               : isEditing
-              ? "Update Entity"
-              : "Create Entity"}
-          </button>
+              ? "Actulizar Entidad"
+              : "Crear Entidad"}
+          </Button>
         </div>
       </form>
     </div>

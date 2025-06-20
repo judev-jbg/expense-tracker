@@ -1,5 +1,23 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import Button from "../common/Button";
+import { AiFillHome } from "react-icons/ai";
+import {
+  MdFlatware,
+  MdLightbulb,
+  MdDirectionsBus,
+  MdGasMeter,
+} from "react-icons/md";
+import { IoFastFoodSharp, IoGameController } from "react-icons/io5";
+import { RiGasStationFill } from "react-icons/ri";
+import { FaCarSide } from "react-icons/fa6";
+import { FaGraduationCap } from "react-icons/fa6";
+import { IoIosCard, IoIosWater } from "react-icons/io";
+import { PiFilmSlateFill } from "react-icons/pi";
+import { FaMobile, FaStore } from "react-icons/fa";
+import { TbTargetArrow, TbPillFilled } from "react-icons/tb";
+import { BsFillSuitcase2Fill } from "react-icons/bs";
+import { GiElectric } from "react-icons/gi";
 
 const ExpenseTypeForm = ({ expenseType, onSubmit, onCancel, isEditing }) => {
   const {
@@ -12,8 +30,8 @@ const ExpenseTypeForm = ({ expenseType, onSubmit, onCancel, isEditing }) => {
     defaultValues: {
       name: "",
       description: "",
-      icon: "💰",
-      color: "#6200ea",
+      icon: <IoIosCard />,
+      color: "#6750a4",
     },
   });
 
@@ -24,8 +42,8 @@ const ExpenseTypeForm = ({ expenseType, onSubmit, onCancel, isEditing }) => {
       reset({
         name: expenseType.name || "",
         description: expenseType.description || "",
-        icon: expenseType.icon || "💰",
-        color: expenseType.color || "#6200ea",
+        icon: expenseType.icon || <IoIosCard />,
+        color: expenseType.color || "#6750a4",
       });
     }
   }, [expenseType, reset]);
@@ -38,29 +56,32 @@ const ExpenseTypeForm = ({ expenseType, onSubmit, onCancel, isEditing }) => {
   };
 
   const commonIcons = [
-    "💰",
-    "🍽️",
-    "🚗",
-    "💡",
-    "🎬",
-    "🏥",
-    "🛍️",
-    "🏠",
-    "📱",
-    "⛽",
-    "🚌",
-    "🎯",
-    "💊",
-    "🎓",
-    "🧳",
-    "🎮",
+    <MdLightbulb />,
+    <IoIosWater />,
+    <MdGasMeter />,
+    <GiElectric />,
+    <MdFlatware />,
+    <FaStore />,
+    <IoFastFoodSharp />,
+    <FaCarSide />,
+    <IoIosCard />,
+    <PiFilmSlateFill />,
+    <AiFillHome />,
+    <FaMobile />,
+    <RiGasStationFill />,
+    <MdDirectionsBus />,
+    <TbTargetArrow />,
+    <TbPillFilled />,
+    <FaGraduationCap />,
+    <BsFillSuitcase2Fill />,
+    <IoGameController />,
   ];
 
   return (
     <div className="expense-type-form md-card">
       <div className="form-header">
         <h3 className="md-typescale-title-large">
-          {isEditing ? "Edit Expense Type" : "New Expense Type"}
+          {isEditing ? "Editar Tipo de gasto" : "Nuevo Tipo de gasto"}
         </h3>
       </div>
 
@@ -68,25 +89,26 @@ const ExpenseTypeForm = ({ expenseType, onSubmit, onCancel, isEditing }) => {
         <div className="form-row">
           <div className="md-text-field">
             <label htmlFor="name" className="md-text-field-label">
-              Name *
+              Nombre *
             </label>
             <input
               id="name"
               type="text"
               className={`md-text-field-input ${errors.name ? "error" : ""}`}
-              placeholder="e.g. Food & Dining"
+              placeholder="ej. Comida & Comerdores, Servicios, Suscripciones"
               {...register("name", {
-                required: "Name is required",
+                required: "El nombre es obligatorio",
                 minLength: {
                   value: 2,
-                  message: "Name must be at least 2 characters",
+                  message: "El nombre debe tener al menos 2 caracteres",
                 },
                 maxLength: {
                   value: 50,
-                  message: "Name must be less than 50 characters",
+                  message: "El nombre debe tener menos de 50 caracteres",
                 },
               })}
               disabled={isSubmitting}
+              autoFocus="true"
             />
             {errors.name && (
               <span className="md-text-field-error">{errors.name.message}</span>
@@ -97,19 +119,19 @@ const ExpenseTypeForm = ({ expenseType, onSubmit, onCancel, isEditing }) => {
         <div className="form-row">
           <div className="md-text-field">
             <label htmlFor="description" className="md-text-field-label">
-              Description
+              Descripción
             </label>
             <textarea
               id="description"
               className={`md-text-field-input ${
                 errors.description ? "error" : ""
               }`}
-              placeholder="Brief description of this expense type"
+              placeholder="Breve descripción de este tipo de gasto"
               rows="3"
               {...register("description", {
                 maxLength: {
                   value: 200,
-                  message: "Description must be less than 200 characters",
+                  message: "La descripción debe tener menos de 200 caracteres",
                 },
               })}
               disabled={isSubmitting}
@@ -125,15 +147,15 @@ const ExpenseTypeForm = ({ expenseType, onSubmit, onCancel, isEditing }) => {
         <div className="form-row form-row-split">
           <div className="md-text-field">
             <label htmlFor="icon" className="md-text-field-label">
-              Icon
+              Icono
             </label>
             <input
               id="icon"
               type="text"
               className={`md-text-field-input ${errors.icon ? "error" : ""}`}
-              placeholder="💰"
+              placeholder={<IoIosCard />}
               {...register("icon", {
-                required: "Icon is required",
+                required: "El icono es obligatorio",
               })}
               disabled={isSubmitting}
             />
@@ -152,14 +174,14 @@ const ExpenseTypeForm = ({ expenseType, onSubmit, onCancel, isEditing }) => {
                 type="color"
                 className="color-input"
                 {...register("color", {
-                  required: "Color is required",
+                  required: "El color es obligatorio",
                 })}
                 disabled={isSubmitting}
               />
-              <div
+              {/* <div
                 className="color-preview"
                 style={{ backgroundColor: watchedColor }}
-              />
+              /> */}
             </div>
             {errors.color && (
               <span className="md-text-field-error">
@@ -170,11 +192,13 @@ const ExpenseTypeForm = ({ expenseType, onSubmit, onCancel, isEditing }) => {
         </div>
 
         <div className="icon-selector">
-          <label className="md-text-field-label">Quick Icon Selection</label>
+          <label className="md-text-field-label">
+            Selección rápida de iconos
+          </label>
           <div className="icon-grid">
-            {commonIcons.map((icon) => (
+            {commonIcons.map((icon, index) => (
               <button
-                key={icon}
+                key={index}
                 type="button"
                 className="icon-option"
                 onClick={() => reset({ ...watch(), icon })}
@@ -193,23 +217,22 @@ const ExpenseTypeForm = ({ expenseType, onSubmit, onCancel, isEditing }) => {
             onClick={onCancel}
             disabled={isSubmitting}
           >
-            Cancel
+            Cancelar
           </button>
-          <button
+
+          <Button
             type="submit"
-            className={`md-button md-button-filled ${
-              isSubmitting ? "loading" : ""
-            }`}
+            className={`${isSubmitting ? "loading" : ""}`}
             disabled={isSubmitting}
           >
             {isSubmitting
               ? isEditing
-                ? "Updating..."
-                : "Creating..."
+                ? "Actualizando..."
+                : "Creando..."
               : isEditing
-              ? "Update Type"
-              : "Create Type"}
-          </button>
+              ? "Actualizar Tipo de gasto"
+              : "Crear Tipo de gasto"}
+          </Button>
         </div>
       </form>
     </div>

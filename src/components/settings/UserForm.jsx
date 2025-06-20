@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import Button from "../common/Button";
 
 const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
   const {
@@ -56,13 +57,13 @@ const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
   const roles = [
     {
       value: "user",
-      label: "User",
-      description: "Can manage their own expenses",
+      label: "Usuario",
+      description: "Pueden gestionar sus propios gastos",
     },
     {
       value: "admin",
-      label: "Administrator",
-      description: "Full system access including user management",
+      label: "Administrador",
+      description: "Acceso total al sistema, incluida la gestión de usuarios",
     },
   ];
 
@@ -74,20 +75,20 @@ const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
   ];
 
   const themes = [
-    { value: "dark", label: "Dark Theme" },
-    { value: "light", label: "Light Theme" },
+    { value: "dark", label: "Tema oscuro" },
+    { value: "light", label: "Tema claro" },
   ];
 
   return (
     <div className="user-form md-card">
       <div className="form-header">
         <h3 className="md-typescale-title-large">
-          {isEditing ? "Edit User" : "New User"}
+          {isEditing ? "Editar Usuario" : "Nuevo Usuario"}
         </h3>
         <p className="md-typescale-body-small form-subtitle">
           {isEditing
-            ? "Update user information and permissions"
-            : "Create a new user account with appropriate permissions"}
+            ? "Actualizar la información y los permisos de los usuarios"
+            : "Crear una nueva cuenta de usuario con los permisos adecuados"}
         </p>
       </div>
 
@@ -95,13 +96,13 @@ const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
         {/* Personal Information */}
         <div className="form-section">
           <h4 className="md-typescale-title-small section-title">
-            Personal Information
+            Información Personal
           </h4>
 
           <div className="form-row form-row-split">
             <div className="md-text-field">
               <label htmlFor="firstName" className="md-text-field-label">
-                First Name *
+                Nombre *
               </label>
               <input
                 id="firstName"
@@ -111,13 +112,14 @@ const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
                 }`}
                 placeholder="John"
                 {...register("firstName", {
-                  required: "First name is required",
+                  required: "El nombre es obligatorio",
                   minLength: {
                     value: 2,
-                    message: "First name must be at least 2 characters",
+                    message: "El nombre debe tener al menos 2 caracteres",
                   },
                 })}
                 disabled={isSubmitting}
+                autoFocus="true"
               />
               {errors.firstName && (
                 <span className="md-text-field-error">
@@ -128,7 +130,7 @@ const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
 
             <div className="md-text-field">
               <label htmlFor="lastName" className="md-text-field-label">
-                Last Name *
+                Apellidos *
               </label>
               <input
                 id="lastName"
@@ -138,10 +140,10 @@ const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
                 }`}
                 placeholder="Doe"
                 {...register("lastName", {
-                  required: "Last name is required",
+                  required: "Apellido obligatorio",
                   minLength: {
                     value: 2,
-                    message: "Last name must be at least 2 characters",
+                    message: "El apellido debe tener al menos 2 caracteres",
                   },
                 })}
                 disabled={isSubmitting}
@@ -157,7 +159,7 @@ const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
           <div className="form-row">
             <div className="md-text-field">
               <label htmlFor="email" className="md-text-field-label">
-                Email Address *
+                Email *
               </label>
               <input
                 id="email"
@@ -165,10 +167,10 @@ const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
                 className={`md-text-field-input ${errors.email ? "error" : ""}`}
                 placeholder="john.doe@example.com"
                 {...register("email", {
-                  required: "Email is required",
+                  required: "Correo electrónico obligatorio",
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Invalid email address",
+                    message: "Email invalido",
                   },
                 })}
                 disabled={isSubmitting}
@@ -185,10 +187,10 @@ const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
         {/* Authentication */}
         <div className="form-section">
           <h4 className="md-typescale-title-small section-title">
-            Authentication{" "}
+            Autenticación
             {isEditing && (
               <span className="optional-note">
-                (Leave blank to keep current password)
+                (Dejar en blanco para mantener la contraseña actual)
               </span>
             )}
           </h4>
@@ -196,7 +198,7 @@ const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
           <div className="form-row form-row-split">
             <div className="md-text-field">
               <label htmlFor="password" className="md-text-field-label">
-                Password {!isEditing && "*"}
+                Contraseña {!isEditing && "*"}
               </label>
               <input
                 id="password"
@@ -206,14 +208,14 @@ const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
                 }`}
                 placeholder={
                   isEditing
-                    ? "Leave blank to keep current"
-                    : "Create a secure password"
+                    ? "Dejar en blanco para mantenerlo actualizado"
+                    : "Crea una contraseña segura"
                 }
                 {...register("password", {
-                  required: isEditing ? false : "Password is required",
+                  required: isEditing ? false : "La contraseña es obligatoria",
                   minLength: {
                     value: 6,
-                    message: "Password must be at least 6 characters",
+                    message: "La contraseña debe tener al menos 6 caracteres",
                   },
                 })}
                 disabled={isSubmitting}
@@ -227,7 +229,7 @@ const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
 
             <div className="md-text-field">
               <label htmlFor="confirmPassword" className="md-text-field-label">
-                Confirm Password {!isEditing && "*"}
+                Confirmar Contraseña {!isEditing && "*"}
               </label>
               <input
                 id="confirmPassword"
@@ -236,16 +238,18 @@ const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
                   errors.confirmPassword ? "error" : ""
                 }`}
                 placeholder={
-                  isEditing ? "Confirm new password" : "Confirm password"
+                  isEditing
+                    ? "Confirmar nueva contraseña"
+                    : "Confirmar contraseña"
                 }
                 {...register("confirmPassword", {
                   required:
                     !isEditing || watchedPassword
-                      ? "Please confirm the password"
+                      ? "Por favor confirma tu contraseña"
                       : false,
                   validate: (value) => {
                     if (watchedPassword && value !== watchedPassword) {
-                      return "The passwords do not match";
+                      return "La contraseña no coincide";
                     }
                     return true;
                   },
@@ -264,19 +268,19 @@ const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
         {/* Permissions & Settings */}
         <div className="form-section">
           <h4 className="md-typescale-title-small section-title">
-            Permissions & Settings
+            Permisos y Configuración
           </h4>
 
           <div className="form-row">
             <div className="md-text-field">
               <label htmlFor="role" className="md-text-field-label">
-                Role *
+                Rol *
               </label>
               <select
                 id="role"
                 className={`md-text-field-input ${errors.role ? "error" : ""}`}
                 {...register("role", {
-                  required: "Role is required",
+                  required: "El rol es obligatorio",
                 })}
                 disabled={isSubmitting}
               >
@@ -306,7 +310,7 @@ const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
           <div className="form-row form-row-split">
             <div className="md-text-field">
               <label htmlFor="currency" className="md-text-field-label">
-                Default Currency
+                Moneda por defecto
               </label>
               <select
                 id="currency"
@@ -324,7 +328,7 @@ const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
 
             <div className="md-text-field">
               <label htmlFor="theme" className="md-text-field-label">
-                Default Theme
+                Tema por defecto
               </label>
               <select
                 id="theme"
@@ -351,10 +355,10 @@ const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
                   disabled={isSubmitting}
                 />
                 <span className="checkbox-label md-typescale-body-medium">
-                  Active User
+                  Usuario activo
                 </span>
                 <span className="checkbox-description md-typescale-body-small">
-                  Inactive users cannot sign in to the system
+                  Los usuarios inactivos no pueden acceder al sistema
                 </span>
               </label>
             </div>
@@ -369,23 +373,22 @@ const UserForm = ({ user, onSubmit, onCancel, isEditing }) => {
             onClick={onCancel}
             disabled={isSubmitting}
           >
-            Cancel
+            Cancelar
           </button>
-          <button
+
+          <Button
             type="submit"
-            className={`md-button md-button-filled ${
-              isSubmitting ? "loading" : ""
-            }`}
+            className={`${isSubmitting ? "loading" : ""}`}
             disabled={isSubmitting}
           >
             {isSubmitting
               ? isEditing
-                ? "Updating..."
-                : "Creating..."
+                ? "Actualizando..."
+                : "Creando..."
               : isEditing
-              ? "Update User"
-              : "Create User"}
-          </button>
+              ? "Actualizar Usuario"
+              : "Crear Usuario"}
+          </Button>
         </div>
       </form>
     </div>

@@ -1,4 +1,10 @@
 import { useState } from "react";
+import { MdEdit } from "react-icons/md";
+import { IoTrash } from "react-icons/io5";
+import { IoIosEye, IoIosEyeOff } from "react-icons/io";
+import { AiOutlineMobile } from "react-icons/ai";
+import { MdOutlineMailOutline, MdLocationPin } from "react-icons/md";
+import { BiWorld } from "react-icons/bi";
 
 const EntityCard = ({ entity, onEdit, onDelete }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -36,7 +42,7 @@ const EntityCard = ({ entity, onEdit, onDelete }) => {
               onClick={() => setShowDetails(!showDetails)}
               aria-label="Toggle details"
             >
-              {showDetails ? "👁️‍🗨️" : "👁️"}
+              {showDetails ? <IoIosEyeOff /> : <IoIosEye />}
             </button>
           )}
           <button
@@ -44,14 +50,14 @@ const EntityCard = ({ entity, onEdit, onDelete }) => {
             onClick={() => onEdit(entity)}
             aria-label="Edit entity"
           >
-            ✏️
+            <MdEdit />
           </button>
           <button
             className="card-menu-button delete-button"
             onClick={() => setShowDeleteConfirm(true)}
             aria-label="Delete entity"
           >
-            🗑️
+            <IoTrash />
           </button>
         </div>
       </div>
@@ -67,11 +73,15 @@ const EntityCard = ({ entity, onEdit, onDelete }) => {
         {/* Contact Details (collapsible) */}
         {hasContactInfo && showDetails && (
           <div className="contact-details">
-            <h4 className="md-typescale-title-small">Contact Information</h4>
+            <h4 className="md-typescale-title-small">
+              Informacion de contacto
+            </h4>
             <div className="contact-grid">
               {entity.contact_info.phone && (
                 <div className="contact-item">
-                  <span className="contact-icon">📞</span>
+                  <span className="contact-icon">
+                    <AiOutlineMobile />
+                  </span>
                   <a
                     href={`tel:${entity.contact_info.phone}`}
                     className="contact-link"
@@ -82,7 +92,9 @@ const EntityCard = ({ entity, onEdit, onDelete }) => {
               )}
               {entity.contact_info.email && (
                 <div className="contact-item">
-                  <span className="contact-icon">📧</span>
+                  <span className="contact-icon">
+                    <MdOutlineMailOutline />
+                  </span>
                   <a
                     href={`mailto:${entity.contact_info.email}`}
                     className="contact-link"
@@ -93,20 +105,24 @@ const EntityCard = ({ entity, onEdit, onDelete }) => {
               )}
               {entity.contact_info.website && (
                 <div className="contact-item">
-                  <span className="contact-icon">🌐</span>
+                  <span className="contact-icon">
+                    <BiWorld />
+                  </span>
                   <a
                     href={entity.contact_info.website}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="contact-link"
                   >
-                    Website
+                    Sitio WEB
                   </a>
                 </div>
               )}
               {entity.contact_info.address && (
                 <div className="contact-item contact-address">
-                  <span className="contact-icon">📍</span>
+                  <span className="contact-icon">
+                    <MdLocationPin />
+                  </span>
                   <span className="contact-text">
                     {entity.contact_info.address}
                   </span>
@@ -119,7 +135,7 @@ const EntityCard = ({ entity, onEdit, onDelete }) => {
 
       <div className="card-footer">
         <span className="md-typescale-body-small card-date">
-          Created {new Date(entity.created_at).toLocaleDateString()}
+          Creado {new Date(entity.created_at).toLocaleDateString()}
         </span>
       </div>
 
@@ -127,10 +143,10 @@ const EntityCard = ({ entity, onEdit, onDelete }) => {
       {showDeleteConfirm && (
         <div className="delete-modal-overlay">
           <div className="delete-modal md-card">
-            <h3 className="md-typescale-title-medium">Delete Entity</h3>
+            <h3 className="md-typescale-title-medium">Eliminar entidad</h3>
             <p className="md-typescale-body-medium">
-              Are you sure you want to delete "{entity.name}"? This action
-              cannot be undone.
+              ¿Estás seguro de que quieres borrar "{entity.name}"? Esta acción
+              no puede deshacerse.
             </p>
             <div className="modal-actions">
               <button
@@ -147,7 +163,7 @@ const EntityCard = ({ entity, onEdit, onDelete }) => {
                 onClick={handleDelete}
                 disabled={isDeleting}
               >
-                {isDeleting ? "Deleting..." : "Delete"}
+                {isDeleting ? "Eliminando..." : "Eliminar"}
               </button>
             </div>
           </div>

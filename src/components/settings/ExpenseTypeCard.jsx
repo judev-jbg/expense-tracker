@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { MdEdit } from "react-icons/md";
+import { IoTrash } from "react-icons/io5";
 
 const ExpenseTypeCard = ({ expenseType, onEdit, onDelete }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -28,14 +30,14 @@ const ExpenseTypeCard = ({ expenseType, onEdit, onDelete }) => {
             onClick={() => onEdit(expenseType)}
             aria-label="Edit expense type"
           >
-            ✏️
+            <MdEdit />
           </button>
           <button
             className="card-menu-button delete-button"
             onClick={() => setShowDeleteConfirm(true)}
             aria-label="Delete expense type"
           >
-            🗑️
+            <IoTrash />
           </button>
         </div>
       </div>
@@ -53,7 +55,7 @@ const ExpenseTypeCard = ({ expenseType, onEdit, onDelete }) => {
 
       <div className="card-footer">
         <span className="md-typescale-body-small card-date">
-          Created {new Date(expenseType.created_at).toLocaleDateString()}
+          Creado {new Date(expenseType.created_at).toLocaleDateString()}
         </span>
       </div>
 
@@ -61,10 +63,10 @@ const ExpenseTypeCard = ({ expenseType, onEdit, onDelete }) => {
       {showDeleteConfirm && (
         <div className="delete-modal-overlay">
           <div className="delete-modal md-card">
-            <h3 className="md-typescale-title-medium">Delete Expense Type</h3>
+            <h3 className="md-typescale-title-medium">Borrar tipo de gasto</h3>
             <p className="md-typescale-body-medium">
-              Are you sure you want to delete "{expenseType.name}"? This action
-              cannot be undone.
+              ¿Estás seguro de que quieres borrar "{expenseType.name}"? Esta
+              acción no se puede deshacer.
             </p>
             <div className="modal-actions">
               <button
@@ -72,7 +74,7 @@ const ExpenseTypeCard = ({ expenseType, onEdit, onDelete }) => {
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={isDeleting}
               >
-                Cancel
+                Cancelar
               </button>
               <button
                 className={`md-button md-button-filled delete-confirm-button ${
@@ -81,7 +83,7 @@ const ExpenseTypeCard = ({ expenseType, onEdit, onDelete }) => {
                 onClick={handleDelete}
                 disabled={isDeleting}
               >
-                {isDeleting ? "Deleting..." : "Delete"}
+                {isDeleting ? "Eliminando..." : "Eliminar"}
               </button>
             </div>
           </div>

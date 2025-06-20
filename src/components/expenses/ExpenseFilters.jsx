@@ -132,7 +132,7 @@ const ExpenseFilters = ({
     <div className="expense-filters md-card">
       <div className="filters-header">
         <div className="filters-title">
-          <h3 className="md-typescale-title-medium">Filters</h3>
+          <h3 className="md-typescale-title-medium">Filtros</h3>
           {hasActiveFilters && (
             <span className="active-filters-indicator">
               {Object.values(watchedValues).filter((v) => v && v !== "").length}{" "}
@@ -148,7 +148,7 @@ const ExpenseFilters = ({
               className="md-button md-button-outlined clear-filters-button"
               onClick={handleClear}
             >
-              Clear All
+              Quitar Filtros
             </button>
           )}
           <button
@@ -157,7 +157,7 @@ const ExpenseFilters = ({
             onClick={() => setIsExpanded(!isExpanded)}
             aria-expanded={isExpanded}
           >
-            {isExpanded ? "▼" : "▶"} {isExpanded ? "Less" : "More"} Filters
+            {isExpanded ? "▼" : "▶"} {isExpanded ? "Menos" : "Mas"} Filtros
           </button>
         </div>
       </div>
@@ -165,15 +165,15 @@ const ExpenseFilters = ({
       {/* Quick Filters */}
       <div className="quick-filters">
         <span className="md-typescale-body-small quick-filters-label">
-          Quick:
+          Rápido:
         </span>
         <div className="quick-filter-buttons">
           {[
-            { key: "this-month", label: "This Month" },
-            { key: "last-month", label: "Last Month" },
-            { key: "last-7-days", label: "Last 7 Days" },
-            { key: "last-30-days", label: "Last 30 Days" },
-            { key: "this-year", label: "This Year" },
+            { key: "this-month", label: "Este mes" },
+            { key: "last-month", label: "Ultimo mes" },
+            { key: "last-7-days", label: "Ultimos 7 dias" },
+            { key: "last-30-days", label: "Ultimos 30 dias" },
+            { key: "this-year", label: "Este año" },
           ].map(({ key, label }) => (
             <button
               key={key}
@@ -191,27 +191,27 @@ const ExpenseFilters = ({
       <div className="filters-row">
         <div className="md-text-field">
           <label htmlFor="search" className="md-text-field-label">
-            Search
+            Buscar
           </label>
           <input
             id="search"
             type="text"
             className="md-text-field-input"
-            placeholder="Search in descriptions..."
+            placeholder="Buscar por descripción..."
             {...register("search")}
           />
         </div>
 
         <div className="md-text-field">
           <label htmlFor="expense_type_id" className="md-text-field-label">
-            Type
+            Tipo
           </label>
           <select
             id="expense_type_id"
             className="md-text-field-input"
             {...register("expense_type_id")}
           >
-            <option value="">All Types</option>
+            <option value="">Todos</option>
             {expenseTypes.map((type) => (
               <option key={type.id} value={type.id}>
                 {type.icon} {type.name}
@@ -222,7 +222,7 @@ const ExpenseFilters = ({
 
         <div className="md-text-field">
           <label htmlFor="year" className="md-text-field-label">
-            Year
+            Año
           </label>
           <select
             id="year"
@@ -244,14 +244,14 @@ const ExpenseFilters = ({
           <div className="filters-row">
             <div className="md-text-field">
               <label htmlFor="entity_id" className="md-text-field-label">
-                Entity
+                Entidad
               </label>
               <select
                 id="entity_id"
                 className="md-text-field-input"
                 {...register("entity_id")}
               >
-                <option value="">All Entities</option>
+                <option value="">Todos</option>
                 {entities.map((entity) => (
                   <option key={entity.id} value={entity.id}>
                     {entity.name}
@@ -262,14 +262,14 @@ const ExpenseFilters = ({
 
             <div className="md-text-field">
               <label htmlFor="month" className="md-text-field-label">
-                Month
+                Mes
               </label>
               <select
                 id="month"
                 className="md-text-field-input"
                 {...register("month")}
               >
-                <option value="">All Months</option>
+                <option value="">Todos</option>
                 {monthOptions.map((month) => (
                   <option key={month.value} value={month.value}>
                     {month.name}
@@ -282,7 +282,7 @@ const ExpenseFilters = ({
           <div className="filters-row">
             <div className="md-text-field">
               <label htmlFor="date_from" className="md-text-field-label">
-                From Date
+                Desde
               </label>
               <input
                 id="date_from"
@@ -294,7 +294,7 @@ const ExpenseFilters = ({
 
             <div className="md-text-field">
               <label htmlFor="date_to" className="md-text-field-label">
-                To Date
+                Hasta
               </label>
               <input
                 id="date_to"
@@ -308,7 +308,7 @@ const ExpenseFilters = ({
           <div className="filters-row">
             <div className="md-text-field">
               <label htmlFor="min_amount" className="md-text-field-label">
-                Min Amount (€)
+                Min importe (€)
               </label>
               <input
                 id="min_amount"
@@ -323,7 +323,7 @@ const ExpenseFilters = ({
 
             <div className="md-text-field">
               <label htmlFor="max_amount" className="md-text-field-label">
-                Max Amount (€)
+                Max importe (€)
               </label>
               <input
                 id="max_amount"

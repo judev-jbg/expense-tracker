@@ -6,6 +6,10 @@ import ExpenseTypesManager from "../components/settings/ExpenseTypesManager";
 import EntitiesManager from "../components/settings/EntitiesManager";
 import UserPreferences from "../components/settings/UserPreferences";
 import UserManagement from "../components/settings/UserManagement";
+import Spinner from "../components/common/Spinner";
+import { MdManageAccounts, MdSettingsSuggest } from "react-icons/md";
+import { FaTag } from "react-icons/fa6";
+import { HiOfficeBuilding } from "react-icons/hi";
 
 const Settings = () => {
   const { user } = useAuth();
@@ -18,30 +22,30 @@ const Settings = () => {
     const baseSections = [
       {
         id: "expense-types",
-        title: "Expense Types",
-        icon: "🏷️",
-        description: "Manage expense categories",
+        title: "Tipos de gasto",
+        icon: <FaTag />,
+        description: "Gestione sus categorías de gastos",
       },
       {
         id: "entities",
-        title: "Entities",
-        icon: "🏢",
-        description: "Manage companies and providers",
+        title: "Entidades",
+        icon: <HiOfficeBuilding />,
+        description: "Gestionar entidades y organizaciones",
       },
       {
         id: "preferences",
-        title: "Preferences",
-        icon: "⚙️",
-        description: "User settings and preferences",
+        title: "Preferencias",
+        icon: <MdSettingsSuggest />,
+        description: "Ajustes y preferencias del usuario",
       },
     ];
 
     if (isAdmin) {
       baseSections.splice(0, 0, {
         id: "user-management",
-        title: "User Management",
-        icon: "👥",
-        description: "Manage system users and permissions",
+        title: "Gestión de usuarios",
+        icon: <MdManageAccounts />,
+        description: "Gestionar usuarios y permisos del sistema",
       });
     }
 
@@ -75,7 +79,9 @@ const Settings = () => {
   if (roleLoading) {
     return (
       <div className="loading-container">
-        <div className="loading-spinner">Loading settings...</div>
+        <div className="loading-spinner">
+          <Spinner />
+        </div>
       </div>
     );
   }
@@ -83,10 +89,10 @@ const Settings = () => {
   return (
     <div className="settings-container">
       <div className="settings-header">
-        <h1 className="md-typescale-headline-medium">Settings</h1>
+        <h1 className="md-typescale-headline-medium">Configuración</h1>
         <p className="md-typescale-body-medium settings-subtitle">
-          Manage your expense categories, entities, and preferences
-          {isAdmin && " · Administrator Access"}
+          Gestione sus categorías de gastos, entidades y preferencias
+          {isAdmin && " · Acceso de administrador"}
         </p>
       </div>
 

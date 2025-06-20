@@ -32,11 +32,15 @@ const FileUpload = ({
     const errors = [];
 
     if (!acceptedTypes.includes(file.type)) {
-      errors.push(`File type ${file.type} is not supported`);
+      errors.push(`Tipo de archivo ${file.type} no es compatible`);
     }
 
     if (file.size > maxFileSize) {
-      errors.push(`File size must be less than ${formatFileSize(maxFileSize)}`);
+      errors.push(
+        `El tamaño del archivo debe ser inferior a ${formatFileSize(
+          maxFileSize
+        )}`
+      );
     }
 
     return errors;
@@ -103,7 +107,7 @@ const FileUpload = ({
 
   const handleFiles = async (files) => {
     if (uploadedFiles.length + files.length > maxFiles) {
-      alert(`You can only upload up to ${maxFiles} files`);
+      alert(`Sólo puede cargar hasta ${maxFiles} arcchivos`);
       return;
     }
 
@@ -120,7 +124,7 @@ const FileUpload = ({
     });
 
     if (errors.length > 0) {
-      alert("Some files could not be uploaded:\n" + errors.join("\n"));
+      alert("No se han podido cargar algunos archivos:\n" + errors.join("\n"));
     }
 
     if (validFiles.length === 0) return;
@@ -138,11 +142,13 @@ const FileUpload = ({
 
       const failedUploads = results.filter((result) => result.error);
       if (failedUploads.length > 0) {
-        alert(`${failedUploads.length} file(s) failed to upload`);
+        alert(
+          `${failedUploads.length} Archivo(s) no cargado(s)Algunos archivos no pudieron ser cargados`
+        );
       }
     } catch (error) {
       console.error("Upload error:", error);
-      alert("Upload failed. Please try again.");
+      alert("Carga fallida. Por favor, inténtelo de nuevo.");
     }
   };
 
@@ -229,12 +235,12 @@ const FileUpload = ({
           <div className="upload-text">
             <p className="md-typescale-body-medium upload-main-text">
               {isDragging
-                ? "Drop files here to upload"
-                : "Drag & drop files here, or click to select"}
+                ? "Suelte los archivos aquí para cargarlos"
+                : "Arrastre y suelte los archivos aquí, o haga clic para seleccionarlos"}
             </p>
             <p className="md-typescale-body-small upload-help-text">
-              Supports: Images, PDF, Word, Excel documents (max{" "}
-              {formatFileSize(maxFileSize)} each)
+              Soporta: Imágenes, documentos PDF, Word y Excel (maximo{" "}
+              {formatFileSize(maxFileSize)} cada archivo)
             </p>
           </div>
         </div>
@@ -243,12 +249,12 @@ const FileUpload = ({
       {/* Upload Progress */}
       {uploading.length > 0 && (
         <div className="upload-progress-section">
-          <h4 className="md-typescale-title-small">Uploading...</h4>
+          <h4 className="md-typescale-title-small">Cargando...</h4>
           {uploading.map((fileId) => (
             <div key={fileId} className="upload-progress-item">
               <div className="progress-info">
                 <span className="md-typescale-body-small">
-                  Uploading file...
+                  Cargando archivo...
                 </span>
                 <span className="md-typescale-body-small">
                   {Math.round(uploadProgress[fileId] || 0)}%
@@ -269,7 +275,7 @@ const FileUpload = ({
       {uploadedFiles.length > 0 && (
         <div className="uploaded-files-section">
           <h4 className="md-typescale-title-small">
-            Uploaded Files ({uploadedFiles.length}/{maxFiles})
+            Archivos cargados ({uploadedFiles.length}/{maxFiles})
           </h4>
           <div className="uploaded-files-list">
             {uploadedFiles.map((file, index) => (
@@ -291,7 +297,7 @@ const FileUpload = ({
                         onClick={() =>
                           window.open(file.google_drive_url, "_blank")
                         }
-                        title="View file"
+                        title="Ver archivo"
                       >
                         👁️
                       </button>
@@ -315,9 +321,8 @@ const FileUpload = ({
       {/* File Limits Info */}
       <div className="upload-limits-info">
         <p className="md-typescale-body-small upload-limits-text">
-          • Maximum {maxFiles} files per expense • Maximum{" "}
-          {formatFileSize(maxFileSize)} per file • Files are stored securely in
-          Google Drive
+          Máximo {maxFiles} archivos por gasto <br /> Máximo{" "}
+          {formatFileSize(maxFileSize)} por archivo
         </p>
       </div>
     </div>

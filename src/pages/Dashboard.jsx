@@ -9,6 +9,7 @@ import MonthlyTrend from "../components/dashboard/MonthlyTrend";
 import InsightsWidget from "../components/dashboard/InsightsWidget";
 import PeriodSelector from "../components/dashboard/PeriodSelector";
 import Spinner from "../components/common/Spinner";
+import { IoStatsChart } from "react-icons/io5";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -103,14 +104,14 @@ const Dashboard = () => {
           <span className="error-icon">⚠️</span>
           <div>
             <h3 className="md-typescale-title-medium">
-              Error Loading Dashboard
+              Error cargando el dashboard
             </h3>
             <p className="md-typescale-body-medium">{error}</p>
             <button
               className="md-button md-button-outlined"
               onClick={loadDashboardData}
             >
-              Try Again
+              Intente de nuevo
             </button>
           </div>
         </div>
@@ -122,7 +123,9 @@ const Dashboard = () => {
     return (
       <div className="dashboard-empty">
         <div className="empty-dashboard md-card">
-          <div className="empty-icon">📊</div>
+          <div className="empty-icon">
+            <IoStatsChart />
+          </div>
           <h2 className="md-typescale-headline-small">Aún no hay datos</h2>
           <p className="md-typescale-body-medium">
             Empieza a añadir gastos para ver cómo cobra vida tu cuadro de mandos

@@ -1,5 +1,13 @@
 import { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
+import { FaCrown } from "react-icons/fa6";
+import { BiSolidUser } from "react-icons/bi";
+import { SiCyberdefenders } from "react-icons/si";
+import { MdEdit, MdCheck, MdClose, MdSunny } from "react-icons/md";
+import { IoFingerPrint } from "react-icons/io5";
+import { GrMoney } from "react-icons/gr";
+import { IoMdMoon } from "react-icons/io";
+import { FaMoneyBill1Wave } from "react-icons/fa6";
 
 const UserCard = ({
   user,
@@ -19,7 +27,7 @@ const UserCard = ({
 
   const formatDate = (dateString) => {
     if (!dateString) return "Never";
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("es-ES", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -42,11 +50,11 @@ const UserCard = ({
   const getRoleIcon = (role) => {
     switch (role) {
       case "admin":
-        return "👑";
+        return <FaCrown />;
       case "user":
-        return "👤";
+        return <BiSolidUser />;
       default:
-        return "❓";
+        return <SiCyberdefenders />;
     }
   };
 
@@ -65,7 +73,7 @@ const UserCard = ({
 
   const handlePasswordReset = async () => {
     if (!newPassword || newPassword.length < 6) {
-      alert("Password must be at least 6 characters long");
+      alert("La contraseña debe tener al menos 6 caracteres");
       return;
     }
 
@@ -75,7 +83,7 @@ const UserCard = ({
     if (success) {
       setShowPasswordReset(false);
       setNewPassword("");
-      alert("Password reset successfully");
+      alert("Contraseña restablecida correctamente");
     }
     setIsResetting(false);
   };
@@ -121,8 +129,10 @@ const UserCard = ({
                     setShowActions(false);
                   }}
                 >
-                  <span className="action-icon">✏️</span>
-                  Edit User
+                  <span className="action-icon">
+                    <MdEdit />
+                  </span>
+                  Editar Usuario
                 </button>
 
                 <button
@@ -132,8 +142,10 @@ const UserCard = ({
                     setShowActions(false);
                   }}
                 >
-                  <span className="action-icon">🔑</span>
-                  Reset Password
+                  <span className="action-icon">
+                    <IoFingerPrint />
+                  </span>
+                  Resetear Contraseña
                 </button>
 
                 {!isCurrentUser && (
@@ -147,9 +159,9 @@ const UserCard = ({
                     }}
                   >
                     <span className="action-icon">
-                      {user.is_active ? "🚫" : "✅"}
+                      {user.is_active ? <MdClose /> : <MdCheck />}
                     </span>
-                    {user.is_active ? "Deactivate" : "Reactivate"}
+                    {user.is_active ? "Deactivar" : "Reactivar"}
                   </button>
                 )}
               </div>
@@ -164,40 +176,41 @@ const UserCard = ({
             {user.full_name ||
               `${user.first_name} ${user.last_name}` ||
               "Unknown User"}
-            {isCurrentUser && <span className="current-user-badge">You</span>}
           </h3>
           <p className="user-email md-typescale-body-medium">{user.email}</p>
         </div>
 
         <div className="user-status">
           <div className="status-item">
-            <span className="status-label md-typescale-body-small">Status</span>
+            <span className="status-label md-typescale-body-small">Estado</span>
             <span
               className={`status-value md-typescale-body-medium ${
                 user.is_active ? "active" : "inactive"
               }`}
             >
-              {user.is_active ? "Active" : "Inactive"}
+              {user.is_active ? "Activo" : "Inactivo"}
             </span>
           </div>
 
           <div className="status-item">
             <span className="status-label md-typescale-body-small">
-              Email Verified
+              Email Verificado
             </span>
             <span
               className={`status-value md-typescale-body-medium ${
                 user.email_confirmed_at ? "verified" : "unverified"
               }`}
             >
-              {user.email_confirmed_at ? "Yes" : "No"}
+              {user.email_confirmed_at ? "Si" : "No"}
             </span>
           </div>
         </div>
 
         <div className="user-preferences">
           <div className="preference-item">
-            <span className="preference-icon">💰</span>
+            <span className="preference-icon">
+              <FaMoneyBill1Wave />
+            </span>
             <span className="preference-text md-typescale-body-small">
               {user.currency || "EUR"}
             </span>
@@ -205,10 +218,10 @@ const UserCard = ({
 
           <div className="preference-item">
             <span className="preference-icon">
-              {user.theme === "dark" ? "🌙" : "☀️"}
+              {user.theme === "dark" ? <IoMdMoon /> : <MdSunny />}
             </span>
             <span className="preference-text md-typescale-body-small">
-              {user.theme === "dark" ? "Dark" : "Light"}
+              {user.theme === "dark" ? "Oscuro" : "Claro"}
             </span>
           </div>
         </div>
@@ -218,7 +231,7 @@ const UserCard = ({
         <div className="user-dates">
           <div className="date-item">
             <span className="date-label md-typescale-body-small">
-              Registered
+              Registrado
             </span>
             <span className="date-value md-typescale-body-small">
               {formatDate(user.registered_at)}
@@ -227,7 +240,7 @@ const UserCard = ({
 
           <div className="date-item">
             <span className="date-label md-typescale-body-small">
-              Last Sign In
+              Ultimo inicio de sesión
             </span>
             <span className="date-value md-typescale-body-small">
               {formatDate(user.last_sign_in_at)}

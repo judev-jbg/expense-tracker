@@ -1,3 +1,4 @@
+import { HiOutlineLightBulb, HiLightBulb } from "react-icons/hi";
 const InsightsWidget = ({ insights, formatCurrency }) => {
   if (!insights || insights.length === 0) {
     return null;
@@ -9,7 +10,7 @@ const InsightsWidget = ({ insights, formatCurrency }) => {
       case "daily_average":
         return formatCurrency(insight.value);
       case "most_frequent":
-        return `${insight.value} times`;
+        return `${insight.value} veces`;
       default:
         return insight.value.toString();
     }
@@ -31,7 +32,9 @@ const InsightsWidget = ({ insights, formatCurrency }) => {
   return (
     <div className="insights-widget widget md-card">
       <div className="widget-header">
-        <h3 className="md-typescale-title-medium widget-title">💡 Insights</h3>
+        <h3 className="md-typescale-title-medium widget-title">
+          <HiOutlineLightBulb /> Insights
+        </h3>
       </div>
 
       <div className="insights-list">
@@ -63,9 +66,11 @@ const InsightsWidget = ({ insights, formatCurrency }) => {
       {/* Additional Tips */}
       <div className="insights-tips">
         <div className="tip-item">
-          <span className="tip-icon">💡</span>
+          <span className="tip-icon">
+            <HiLightBulb />
+          </span>
           <span className="tip-text md-typescale-body-small">
-            Track your spending patterns to identify areas for improvement
+            Siga sus pautas de gasto para identificar áreas de mejora
           </span>
         </div>
       </div>

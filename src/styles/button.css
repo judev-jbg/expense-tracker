@@ -100,19 +100,27 @@
 
 /* 5. FAB (Floating Action Button) */
 .md-button.fab {
-  background-color: var(--md-sys-color-primary, #6200ee);
-  color: var(--md-sys-color-on-primary);
-  border-radius: 50%;
-  box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.2),
-    0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12);
-  min-width: 56px;
-  min-height: 56px;
+  background-color: var(--md-sys-color-primary-container, #6200ee);
+  color: var(--md-sys-color-on-primary-container);
+  width: 56px;
+  height: 56px !important;
+  border-radius: 16px !important;
   padding: 0;
   position: relative;
-  -webkit-box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.2);
-  -moz-box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.2);
-  -ms-box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.2);
-  -o-box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.3),
+    0px 6px 10px 0px rgba(0, 0, 0, 0.17), 0px 1px 18px 0px rgba(0, 0, 0, 0.16);
+  -webkit-box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.3),
+    0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12);
+  -moz-box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.3),
+    0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12);
+  -ms-box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.3),
+    0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12);
+  -o-box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.3),
+    0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12);
+  -webkit-border-radius: 16px !important;
+  -moz-border-radius: 16px !important;
+  -ms-border-radius: 16px !important;
+  -o-border-radius: 16px !important;
 }
 
 .md-button.fab.small {

@@ -3,6 +3,8 @@ import { useRole } from "../../contexts/RoleContext";
 import { userManagementService } from "../../libs/configService";
 import UserForm from "./UserForm";
 import UserCard from "./UserCard";
+import Spinner from "../common/Spinner";
+import Button from "../common/Button";
 
 const UserManagement = () => {
   const { isAdmin, loading: roleLoading } = useRole();
@@ -118,7 +120,9 @@ const UserManagement = () => {
   if (roleLoading || loading) {
     return (
       <div className="loading-container">
-        <div className="loading-spinner">Loading users...</div>
+        <div className="loading-spinner">
+          <Spinner />
+        </div>
       </div>
     );
   }
@@ -128,9 +132,9 @@ const UserManagement = () => {
       <div className="user-management">
         <div className="section-header">
           <div className="section-title">
-            <h2 className="md-typescale-headline-small">Users</h2>
+            <h2 className="md-typescale-headline-small">Usuarios</h2>
             <p className="md-typescale-body-medium section-description">
-              View system users
+              Ver usuarios del sistema
             </p>
           </div>
         </div>
@@ -139,7 +143,9 @@ const UserManagement = () => {
           {users.length === 0 ? (
             <div className="empty-state md-card">
               <div className="empty-icon">👥</div>
-              <h3 className="md-typescale-title-medium">Loading users...</h3>
+              <h3 className="md-typescale-title-medium">
+                <Spinner />
+              </h3>
             </div>
           ) : (
             users.map((user) => (
@@ -163,20 +169,18 @@ const UserManagement = () => {
     <div className="user-management">
       <div className="section-header">
         <div className="section-title">
-          <h2 className="md-typescale-headline-small">User Management</h2>
+          <h2 className="md-typescale-headline-small">Gestión de usuarios</h2>
           <p className="md-typescale-body-medium section-description">
-            Create and manage system users, assign roles and permissions.
+            Crear y gestionar usuarios del sistema, asignar funciones y
+            permisos.
           </p>
         </div>
 
-        <button
-          className="md-button md-button-filled"
+        <Button
+          children="Agregar usuario"
           onClick={() => setShowForm(true)}
           disabled={showForm}
-        >
-          <span className="button-icon">➕</span>
-          Add User
-        </button>
+        />
       </div>
 
       {error && (
@@ -199,9 +203,9 @@ const UserManagement = () => {
         {users.length === 0 ? (
           <div className="empty-state md-card">
             <div className="empty-icon">👥</div>
-            <h3 className="md-typescale-title-medium">No users yet</h3>
+            <h3 className="md-typescale-title-medium">Aún no hay usuarios</h3>
             <p className="md-typescale-body-medium">
-              Create your first user to get started.
+              Crea tu primer usuario para empezar.
             </p>
           </div>
         ) : (
@@ -220,29 +224,29 @@ const UserManagement = () => {
       </div>
 
       <div className="user-stats md-card">
-        <h3 className="md-typescale-title-medium">User Statistics</h3>
+        <h3 className="md-typescale-title-medium">Estadísticas de usuarios</h3>
         <div className="stats-grid">
           <div className="stat-item">
             <span className="stat-value">{users.length}</span>
-            <span className="stat-label">Total Users</span>
+            <span className="stat-label">Usuarios totales</span>
           </div>
           <div className="stat-item">
             <span className="stat-value">
               {users.filter((u) => u.is_active).length}
             </span>
-            <span className="stat-label">Active Users</span>
+            <span className="stat-label">Usuarios activos</span>
           </div>
           <div className="stat-item">
             <span className="stat-value">
               {users.filter((u) => u.role === "admin").length}
             </span>
-            <span className="stat-label">Administrators</span>
+            <span className="stat-label">Administradores</span>
           </div>
           <div className="stat-item">
             <span className="stat-value">
               {users.filter((u) => u.last_sign_in_at).length}
             </span>
-            <span className="stat-label">Ever Signed In</span>
+            <span className="stat-label">¿Alguna vez ha iniciado sesión?</span>
           </div>
         </div>
       </div>

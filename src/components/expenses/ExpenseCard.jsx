@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { IoTrash } from "react-icons/io5";
+import { MdModeEditOutline } from "react-icons/md";
+import { IoMdPricetags } from "react-icons/io";
 
 const ExpenseCard = ({ expense, onEdit, onDelete, onView }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -12,7 +15,7 @@ const ExpenseCard = ({ expense, onEdit, onDelete, onView }) => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("es-ES", {
       day: "2-digit",
       month: "short",
     });
@@ -46,14 +49,14 @@ const ExpenseCard = ({ expense, onEdit, onDelete, onView }) => {
             onClick={() => onEdit(expense)}
             aria-label="Edit expense"
           >
-            ✏️
+            <MdModeEditOutline />
           </button>
           <button
             className="card-menu-button delete-button"
             onClick={() => setShowDeleteConfirm(true)}
             aria-label="Delete expense"
           >
-            🗑️
+            <IoTrash />
           </button>
         </div>
       </div>
@@ -105,7 +108,13 @@ const ExpenseCard = ({ expense, onEdit, onDelete, onView }) => {
           )}
           {expense.tags && expense.tags.length > 0 && (
             <span className="tags-indicator" title="Has tags">
-              🏷️
+              <IoMdPricetags />
+              {expense.tags.map((tag, index) => (
+                <span key={index}>
+                  {tag}
+                  {index < expense.tags.length - 1 && ", "}
+                </span>
+              ))}
             </span>
           )}
         </div>
@@ -122,10 +131,10 @@ const ExpenseCard = ({ expense, onEdit, onDelete, onView }) => {
           onClick={(e) => e.stopPropagation()}
         >
           <div className="delete-modal md-card">
-            <h3 className="md-typescale-title-medium">Delete Expense</h3>
+            <h3 className="md-typescale-title-medium">Eliminar gasto</h3>
             <p className="md-typescale-body-medium">
-              Are you sure you want to delete this expense of{" "}
-              {formatAmount(expense.amount)}? This action cannot be undone.
+              ¿Está seguro de que desea eliminar este gasto de{" "}
+              {formatAmount(expense.amount)}? Esta acción no puede deshacerse.
             </p>
             <div className="modal-actions">
               <button
@@ -136,7 +145,7 @@ const ExpenseCard = ({ expense, onEdit, onDelete, onView }) => {
                 }}
                 disabled={isDeleting}
               >
-                Cancel
+                Cancelar
               </button>
               <button
                 className={`md-button md-button-filled delete-confirm-button ${
@@ -148,7 +157,7 @@ const ExpenseCard = ({ expense, onEdit, onDelete, onView }) => {
                 }}
                 disabled={isDeleting}
               >
-                {isDeleting ? "Deleting..." : "Delete"}
+                {isDeleting ? "Eliminando..." : "Eliminar"}
               </button>
             </div>
           </div>

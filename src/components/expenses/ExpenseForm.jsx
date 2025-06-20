@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import FileUpload from "./FileUpload";
+import Button from "../common/Button";
 
 const ExpenseForm = ({
   expense,
@@ -130,12 +131,12 @@ const ExpenseForm = ({
     <div className="expense-form md-card">
       <div className="form-header">
         <h3 className="md-typescale-title-large">
-          {isEditing ? "Edit Expense" : "New Expense"}
+          {isEditing ? "Editar Gasto" : "Nuevo Gasto"}
         </h3>
         <p className="md-typescale-body-small form-subtitle">
           {isEditing
-            ? "Update your expense details"
-            : `Adding expense for ${new Date().toLocaleDateString("en-US", {
+            ? "Actualice sus datos de gastos"
+            : `Añadir gastos para ${new Date().toLocaleDateString("es-ES", {
                 month: "long",
                 year: "numeric",
               })}`}
@@ -147,7 +148,7 @@ const ExpenseForm = ({
         <div className="form-row form-row-split">
           <div className="md-text-field">
             <label htmlFor="amount" className="md-text-field-label">
-              Amount (€) *
+              Importe (€) *
             </label>
             <input
               id="amount"
@@ -157,17 +158,18 @@ const ExpenseForm = ({
               className={`md-text-field-input ${errors.amount ? "error" : ""}`}
               placeholder="0.00"
               {...register("amount", {
-                required: "Amount is required",
+                required: "El importe es obligatorio",
                 min: {
                   value: 0.01,
-                  message: "Amount must be greater than 0",
+                  message: "El importe debe ser superior a 0",
                 },
                 max: {
                   value: 999999.99,
-                  message: "Amount is too large",
+                  message: "Importe demasiado elevado",
                 },
               })}
               disabled={isSubmitting}
+              autoFocus="true"
             />
             {errors.amount && (
               <span className="md-text-field-error">
@@ -193,7 +195,7 @@ const ExpenseForm = ({
 
           <div className="md-text-field">
             <label htmlFor="expense_date" className="md-text-field-label">
-              Date *
+              Fecha *
             </label>
             <input
               id="expense_date"
@@ -202,7 +204,7 @@ const ExpenseForm = ({
                 errors.expense_date ? "error" : ""
               }`}
               {...register("expense_date", {
-                required: "Date is required",
+                required: "La fecha es obligatoria",
               })}
               disabled={isSubmitting}
             />
@@ -218,7 +220,7 @@ const ExpenseForm = ({
         <div className="form-row">
           <div className="md-text-field">
             <label htmlFor="expense_type_id" className="md-text-field-label">
-              Expense Type *
+              Tipo de gasto *
             </label>
             <select
               id="expense_type_id"
@@ -226,11 +228,11 @@ const ExpenseForm = ({
                 errors.expense_type_id ? "error" : ""
               }`}
               {...register("expense_type_id", {
-                required: "Expense type is required",
+                required: "El tipo de gasto es obligatorio",
               })}
               disabled={isSubmitting}
             >
-              <option value="">Select expense type</option>
+              <option value="">Selecciona un tipo de gasto</option>
               {expenseTypes.map((type) => (
                 <option key={type.id} value={type.id}>
                   {type.icon} {type.name}
@@ -249,7 +251,7 @@ const ExpenseForm = ({
         <div className="form-row">
           <div className="md-text-field">
             <label htmlFor="entity_id" className="md-text-field-label">
-              Entity *
+              Entidad *
             </label>
             <select
               id="entity_id"
@@ -257,12 +259,14 @@ const ExpenseForm = ({
                 errors.entity_id ? "error" : ""
               }`}
               {...register("entity_id", {
-                required: "Entity is required",
+                required: "La entidad es obligatoria",
               })}
               disabled={isSubmitting || !selectedTypeId}
             >
               <option value="">
-                {selectedTypeId ? "Select entity" : "Select expense type first"}
+                {selectedTypeId
+                  ? "Seleccionar entidad"
+                  : "Seleccione primero el tipo de gasto"}
               </option>
               {filteredEntities.map((entity) => (
                 <option key={entity.id} value={entity.id}>
@@ -277,8 +281,8 @@ const ExpenseForm = ({
             )}
             {filteredEntities.length === 0 && selectedTypeId && (
               <span className="md-text-field-error">
-                No entities found for this expense type. Please add one in
-                Settings.
+                No se han encontrado entidades para este tipo de gasto. Por
+                favor, añada una en Settings.
               </span>
             )}
           </div>
@@ -288,7 +292,7 @@ const ExpenseForm = ({
         <div className="form-row">
           <div className="md-text-field">
             <label htmlFor="description" className="md-text-field-label">
-              Description
+              Descripción
             </label>
             <input
               id="description"
@@ -315,18 +319,19 @@ const ExpenseForm = ({
         <div className="form-row">
           <div className="md-text-field">
             <label htmlFor="tags" className="md-text-field-label">
-              Tags
+              Etiquetas
             </label>
             <input
               id="tags"
               type="text"
               className="md-text-field-input"
-              placeholder="Separate tags with commas (e.g., urgent, business)"
+              placeholder="Separe las etiquetas con comas (por ejemplo, urgente, negocios)"
               {...register("tags")}
               disabled={isSubmitting}
             />
             <span className="md-typescale-body-small field-help">
-              Add tags to categorize and find expenses easier
+              Añade etiquetas para clasificar y encontrar los gastos más
+              fácilmente
             </span>
           </div>
         </div>
@@ -335,17 +340,17 @@ const ExpenseForm = ({
         <div className="form-row">
           <div className="md-text-field">
             <label htmlFor="notes" className="md-text-field-label">
-              Notes
+              Notas
             </label>
             <textarea
               id="notes"
               className="md-text-field-input"
-              placeholder="Additional notes or details about this expense"
+              placeholder="Notas o detalles adicionales sobre este gasto"
               rows="3"
               {...register("notes", {
                 maxLength: {
                   value: 500,
-                  message: "Notes must be less than 500 characters",
+                  message: "Las notas deben tener menos de 500 caracteres",
                 },
               })}
               disabled={isSubmitting}
@@ -361,7 +366,7 @@ const ExpenseForm = ({
         {/* File Upload */}
         <div className="form-section">
           <h4 className="md-typescale-title-small section-title">
-            Receipts & Documents
+            Recibos y documentos
           </h4>
           <FileUpload
             onFileUpload={handleFileUpload}
@@ -379,23 +384,22 @@ const ExpenseForm = ({
             onClick={onCancel}
             disabled={isSubmitting}
           >
-            Cancel
+            Cancelar
           </button>
-          <button
+
+          <Button
             type="submit"
-            className={`md-button md-button-filled ${
-              isSubmitting ? "loading" : ""
-            }`}
+            className={`${isSubmitting ? "loading" : ""}`}
             disabled={isSubmitting || filteredEntities.length === 0}
           >
             {isSubmitting
               ? isEditing
-                ? "Updating..."
-                : "Creating..."
+                ? "Actualizando..."
+                : "Creando..."
               : isEditing
-              ? "Update Expense"
-              : "Create Expense"}
-          </button>
+              ? "Actualizar Gasto"
+              : "Crear Gasto"}
+          </Button>
         </div>
       </form>
     </div>

@@ -1,30 +1,37 @@
+import { GrMoney } from "react-icons/gr";
+import { TbListNumbers } from "react-icons/tb";
+import { LuChartLine } from "react-icons/lu";
+import { IoCalendarOutline } from "react-icons/io5";
+import { HiArrowTrendingDown, HiArrowTrendingUp } from "react-icons/hi2";
+import { MdOutlineTrendingFlat } from "react-icons/md";
+
 const DashboardSummary = ({ data, formatCurrency }) => {
   const summaryCards = [
     {
-      title: "Total Spent",
+      title: "Total gastado",
       value: formatCurrency(data.totalAmount),
-      icon: "💰",
+      icon: <GrMoney />,
       color: "primary",
       trend: null,
     },
     {
-      title: "Total Expenses",
+      title: "Cantidad de gastos",
       value: data.expenseCount.toString(),
-      icon: "📝",
+      icon: <TbListNumbers />,
       color: "secondary",
       trend: null,
     },
     {
-      title: "Average Expense",
+      title: "Gasto promedio",
       value: formatCurrency(data.avgExpenseAmount),
-      icon: "📊",
+      icon: <LuChartLine />,
       color: "tertiary",
       trend: null,
     },
     {
-      title: "Period",
+      title: "Periodo",
       value: data.period,
-      icon: "📅",
+      icon: <IoCalendarOutline />,
       color: "neutral",
       trend: null,
     },
@@ -40,11 +47,13 @@ const DashboardSummary = ({ data, formatCurrency }) => {
               {card.trend && (
                 <div className={`trend-indicator ${card.trend.type}`}>
                   <span className="trend-icon">
-                    {card.trend.type === "up"
-                      ? "↗️"
-                      : card.trend.type === "down"
-                      ? "↘️"
-                      : "➡️"}
+                    {card.trend.type === "up" ? (
+                      <HiArrowTrendingUp />
+                    ) : card.trend.type === "down" ? (
+                      <HiArrowTrendingDown />
+                    ) : (
+                      <MdOutlineTrendingFlat />
+                    )}
                   </span>
                   <span className="trend-value">{card.trend.value}</span>
                 </div>

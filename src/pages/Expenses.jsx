@@ -8,6 +8,11 @@ import ExpensesList from "../components/expenses/ExpensesList";
 import ExpenseForm from "../components/expenses/ExpenseForm";
 import ExpenseFilters from "../components/expenses/ExpenseFilters";
 import ExpenseDetails from "../components/expenses/ExpenseDetails";
+import Spinner from "../components/common/Spinner";
+import Button from "../components/common/Button";
+import { MdOutlineModeEditOutline } from "react-icons/md";
+import { IoMdSettings } from "react-icons/io";
+import { IoWarning } from "react-icons/io5";
 
 const Expenses = () => {
   const [expenses, setExpenses] = useState([]);
@@ -165,7 +170,9 @@ const Expenses = () => {
   if (loading) {
     return (
       <div className="loading-container">
-        <div className="loading-spinner">Loading expenses...</div>
+        <div className="loading-spinner">
+          <Spinner />
+        </div>
       </div>
     );
   }
@@ -177,20 +184,23 @@ const Expenses = () => {
     return (
       <div className="expenses-container">
         <div className="configuration-required md-card">
-          <div className="config-icon">⚙️</div>
+          <div className="config-icon">
+            <IoMdSettings />
+          </div>
           <h2 className="md-typescale-headline-small">
-            Configuration Required
+            Configuración necesaria
           </h2>
           <p className="md-typescale-body-medium">
-            Before you can create expenses, you need to set up your expense
-            types and entities.
+            Antes de poder crear gastos, es necesario configurar los tipos de
+            gastos y las entidades.
           </p>
           <p className="md-typescale-body-small">
-            Go to Settings to configure your expense categories and entities.
+            Vaya a Configuración para configurar sus categorías de gastos y
+            entidades.
           </p>
           <div className="config-actions">
             <a href="/settings" className="md-button md-button-filled">
-              Go to Settings
+              Ir a Ajustes
             </a>
           </div>
         </div>
@@ -203,25 +213,28 @@ const Expenses = () => {
       {/* Header */}
       <div className="expenses-header">
         <div className="header-content">
-          <h1 className="md-typescale-headline-medium">Expenses</h1>
+          <h1 className="md-typescale-headline-medium">Gastos</h1>
           <p className="md-typescale-body-medium expenses-subtitle">
-            Track and manage your daily expenses
+            Administra tus gastos mensuales, crea nuevos gastos y visualiza tus
+            transacciones pasadas.
           </p>
         </div>
 
-        <button
-          className="md-button md-button-filled add-expense-button"
-          onClick={() => setShowForm(true)}
-          disabled={showForm}
-        >
-          <span className="button-icon">➕</span>
-          Add Expense
-        </button>
+        <div className="header-actions">
+          <Button
+            icon={<MdOutlineModeEditOutline />}
+            variant="fab"
+            onClick={() => setShowForm(true)}
+            disabled={showForm}
+          ></Button>
+        </div>
       </div>
 
       {error && (
         <div className="error-message md-card">
-          <span className="error-icon">⚠️</span>
+          <span className="error-icon">
+            <IoWarning />
+          </span>
           <span className="md-typescale-body-medium">{error}</span>
         </div>
       )}

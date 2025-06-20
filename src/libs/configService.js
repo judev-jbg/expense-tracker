@@ -1,4 +1,10 @@
 import { supabase, dbHelpers } from "./supabase";
+import React from "react";
+import {
+  AiFillPieChart,
+  AiOutlineBarChart,
+  AiOutlineLineChart,
+} from "react-icons/ai";
 
 // Expense Types service
 export const expenseTypesService = {
@@ -704,7 +710,7 @@ export const dashboardService = {
       // Group by month
       const monthlyData = Array.from({ length: 12 }, (_, i) => ({
         month: i + 1,
-        monthName: new Date(year, i).toLocaleDateString("en-US", {
+        monthName: new Date(year, i).toLocaleDateString("es-ES", {
           month: "short",
         }),
         amount: 0,
@@ -810,13 +816,13 @@ export const dashboardService = {
       if (mostExpensiveMonth.amount > 0) {
         insights.push({
           type: "most_expensive_month",
-          title: "Highest Spending Month",
-          description: `You spent the most in ${new Date(
+          title: "Mes de mayor gasto",
+          description: `Usted fue el que más gastó en ${new Date(
             year,
             mostExpensiveMonth.month - 1
-          ).toLocaleDateString("en-US", { month: "long" })}`,
+          ).toLocaleDateString("es-ES", { month: "long" })}`,
           value: mostExpensiveMonth.amount,
-          icon: "📈",
+          icon: React.createElement(AiOutlineBarChart, null),
         });
       }
 
@@ -826,14 +832,17 @@ export const dashboardService = {
           ? new Set(expenses.map((e) => e.expense_date)).size
           : 0;
 
-      if (totalDays > 0) {
+      const currentMonth = new Date().getMonth() + 1;
+      const currentMonthTotal = monthlyTotals[currentMonth];
+
+      if (totalDays > 0 && typeof currentMonthTotal === "number") {
         const dailyAvg = monthlyTotals[new Date().getMonth() + 1] / totalDays;
         insights.push({
           type: "daily_average",
-          title: "Daily Average This Month",
-          description: `On average, you spend this much per day`,
+          title: "Media diaria este mes",
+          description: `De media, gastas esto al día`,
           value: dailyAvg,
-          icon: "📅",
+          icon: React.createElement(AiOutlineLineChart, null),
         });
       }
 
@@ -852,10 +861,10 @@ export const dashboardService = {
       if (topType.count > 0) {
         insights.push({
           type: "most_frequent",
-          title: "Most Frequent Category",
-          description: `${topType.type} appears most often in your expenses`,
+          title: "Categoría más frecuente",
+          description: `${topType.type} aparece más a menudo en sus gastos`,
           value: topType.count,
-          icon: "🎯",
+          icon: React.createElement(AiFillPieChart, null),
         });
       }
 

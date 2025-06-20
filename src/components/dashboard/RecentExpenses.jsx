@@ -33,10 +33,10 @@ const RecentExpenses = ({ expenses, formatCurrency }) => {
     <div className="recent-expenses widget md-card">
       <div className="widget-header">
         <h3 className="md-typescale-title-medium widget-title">
-          Recent Expenses
+          Gastos recientes
         </h3>
         <a href="/expenses" className="view-all-link md-typescale-body-small">
-          View All
+          Ver todos
         </a>
       </div>
 
@@ -54,17 +54,17 @@ const RecentExpenses = ({ expenses, formatCurrency }) => {
 
             <div className="expense-details">
               <div className="expense-main">
-                <span className="expense-entity md-typescale-body-medium">
-                  {expense.entities.name}
+                <span className="expense-category md-typescale-body-medium">
+                  {expense.expense_types.name}
                 </span>
-                <span className="expense-amount md-typescale-title-small">
+                <span className="expense-amount md-typescale-title-medium">
                   {formatCurrency(expense.amount)}
                 </span>
               </div>
 
               <div className="expense-meta">
-                <span className="expense-category md-typescale-body-small">
-                  {expense.expense_types.name}
+                <span className="expense-entity md-typescale-body-small">
+                  {expense.entities.name}
                 </span>
                 <span className="expense-date md-typescale-body-small">
                   {formatDate(expense.expense_date)}
@@ -88,7 +88,7 @@ const RecentExpenses = ({ expenses, formatCurrency }) => {
                 onClick={() => (window.location.href = "/expenses")}
                 title="View details"
               >
-                →
+                {">"}
               </button>
             </div>
           </div>
@@ -97,7 +97,7 @@ const RecentExpenses = ({ expenses, formatCurrency }) => {
 
       <div className="widget-footer">
         <a href="/expenses" className="md-button md-button-outlined full-width">
-          View All Expenses
+          Ver todos los gastos
         </a>
       </div>
     </div>
