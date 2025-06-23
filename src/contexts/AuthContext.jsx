@@ -46,29 +46,9 @@ export const AuthProvider = ({ children }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session?.user?.email);
-
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-
-      // Handle different auth events
-      switch (event) {
-        case "SIGNED_IN":
-          console.log("User signed in:", session?.user?.email);
-          break;
-        case "SIGNED_OUT":
-          console.log("User signed out");
-          break;
-        case "TOKEN_REFRESHED":
-          console.log("Token refreshed for user:", session?.user?.email);
-          break;
-        case "USER_UPDATED":
-          console.log("User updated:", session?.user?.email);
-          break;
-        default:
-          break;
-      }
     });
 
     // Cleanup subscription

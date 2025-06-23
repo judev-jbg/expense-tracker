@@ -1,5 +1,8 @@
 import { useState, useRef } from "react";
-import { googleDriveService } from "../../libs/googleDriveService";
+import { FaCloudArrowUp } from "react-icons/fa6";
+import { IoDocumentTextOutline } from "react-icons/io5";
+import { IoMdImages } from "react-icons/io";
+import { FaRegFilePdf, FaRegFileWord, FaRegFileExcel } from "react-icons/fa";
 
 const FileUpload = ({
   onFileUpload,
@@ -54,16 +57,16 @@ const FileUpload = ({
 
   const getFileIcon = (file) => {
     const type = file.type || file.mime_type;
-    if (!type) return "📄";
+    if (!type) return <IoDocumentTextOutline />;
 
-    if (type.startsWith("image/")) return "🖼️";
-    if (type.includes("pdf")) return "📕";
-    if (type.includes("word") || type.includes("document")) return "📘";
-    if (type.includes("sheet") || type.includes("excel")) return "📗";
-    if (type.includes("presentation") || type.includes("powerpoint"))
-      return "📙";
+    if (type.startsWith("image/")) return <IoMdImages />;
+    if (type.includes("pdf")) return <FaRegFilePdf />;
+    if (type.includes("word") || type.includes("document"))
+      return <FaRegFileWord />;
+    if (type.includes("sheet") || type.includes("excel"))
+      return <FaRegFileExcel />;
 
-    return "📄";
+    return <IoDocumentTextOutline />;
   };
 
   const handleDragEnter = (e) => {
@@ -107,7 +110,7 @@ const FileUpload = ({
 
   const handleFiles = async (files) => {
     if (uploadedFiles.length + files.length > maxFiles) {
-      alert(`Sólo puede cargar hasta ${maxFiles} arcchivos`);
+      alert(`Sólo puede cargar hasta ${maxFiles} archivos`);
       return;
     }
 
@@ -143,7 +146,7 @@ const FileUpload = ({
       const failedUploads = results.filter((result) => result.error);
       if (failedUploads.length > 0) {
         alert(
-          `${failedUploads.length} Archivo(s) no cargado(s)Algunos archivos no pudieron ser cargados`
+          `${failedUploads.length} Archivo(s) no cargado(s). Algunos archivos no pudieron ser cargados`
         );
       }
     } catch (error) {
@@ -165,12 +168,6 @@ const FileUpload = ({
           [fileId]: Math.min(prev[fileId] + Math.random() * 30, 90),
         }));
       }, 200);
-
-      // Use mock upload for development
-      const result = await googleDriveService.mockUpload(
-        file,
-        "temp-expense-id"
-      );
 
       clearInterval(progressInterval);
       setUploadProgress((prev) => ({ ...prev, [fileId]: 100 }));
@@ -231,7 +228,9 @@ const FileUpload = ({
         />
 
         <div className="dropzone-content">
-          <div className="upload-icon">📁</div>
+          <div className="upload-icon">
+            <FaCloudArrowUp />
+          </div>
           <div className="upload-text">
             <p className="md-typescale-body-medium upload-main-text">
               {isDragging
@@ -291,12 +290,10 @@ const FileUpload = ({
                         {formatFileSize(file.file_size || file.size)}
                       </span>
                     )}
-                    {file.google_drive_url && (
+                    {file.url && (
                       <button
                         className="file-view-button"
-                        onClick={() =>
-                          window.open(file.google_drive_url, "_blank")
-                        }
+                        onClick={() => window.open(file.url, "_blank")}
                         title="Ver archivo"
                       >
                         👁️

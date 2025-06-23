@@ -531,12 +531,12 @@ BEGIN
     -- Insert default expense types for new user
     INSERT INTO expense_types (name, description, icon, color, created_by)
     VALUES 
-        ('Food & Dining', 'Groceries, restaurants, food delivery', '🍽️', '#4CAF50', NEW.id),
-        ('Transportation', 'Gas, public transport, car maintenance', '🚗', '#2196F3', NEW.id),
-        ('Utilities', 'Electricity, water, gas, internet', '💡', '#FF9800', NEW.id),
-        ('Entertainment', 'Movies, games, subscriptions', '🎬', '#9C27B0', NEW.id),
-        ('Healthcare', 'Medical expenses, pharmacy, insurance', '🏥', '#F44336', NEW.id),
-        ('Shopping', 'Clothing, electronics, household items', '🛍️', '#607D8B', NEW.id)
+        ('Food & Dining', 'Groceries, restaurants, food delivery', '', '#4CAF50', NEW.id),
+        ('Transportation', 'Gas, public transport, car maintenance', '', '#2196F3', NEW.id),
+        ('Utilities', 'Electricity, water, gas, internet', '', '#FF9800', NEW.id),
+        ('Entertainment', 'Movies, games, subscriptions', '', '#9C27B0', NEW.id),
+        ('Healthcare', 'Medical expenses, pharmacy, insurance', '', '#F44336', NEW.id),
+        ('Shopping', 'Clothing, electronics, household items', '', '#607D8B', NEW.id)
     RETURNING id INTO food_type_id;
 
     -- Get the IDs of created expense types
