@@ -1,3 +1,5 @@
+import { ImFileEmpty } from "react-icons/im";
+import { IconRenderer } from "../../libs/iconMapping";
 const RecentExpenses = ({ expenses, formatCurrency }) => {
   if (!expenses || expenses.length === 0) {
     return (
@@ -6,8 +8,10 @@ const RecentExpenses = ({ expenses, formatCurrency }) => {
           Recent Expenses
         </h3>
         <div className="empty-widget">
-          <div className="empty-icon">📝</div>
-          <p className="md-typescale-body-medium">No recent expenses</p>
+          <div className="empty-icon">
+            <ImFileEmpty />
+          </div>
+          <p className="md-typescale-body-medium">No hay gastos recientes</p>
         </div>
       </div>
     );
@@ -19,11 +23,11 @@ const RecentExpenses = ({ expenses, formatCurrency }) => {
     const diffTime = Math.abs(now - date);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 1) return "Today";
-    if (diffDays === 2) return "Yesterday";
-    if (diffDays <= 7) return `${diffDays - 1} days ago`;
+    if (diffDays === 1) return "Hoy";
+    if (diffDays === 2) return "Ayer";
+    if (diffDays <= 7) return `${diffDays - 1} dias atrás`;
 
-    return date.toLocaleDateString("en-US", {
+    return date.toLocaleDateString("es-ES", {
       month: "short",
       day: "numeric",
     });
@@ -48,7 +52,7 @@ const RecentExpenses = ({ expenses, formatCurrency }) => {
                 className="expense-icon"
                 style={{ backgroundColor: expense.expense_types.color }}
               >
-                {expense.expense_types.icon}
+                <IconRenderer iconId={expense.expense_types.icon} />
               </span>
             </div>
 

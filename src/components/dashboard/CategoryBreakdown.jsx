@@ -1,3 +1,6 @@
+import { ImFileEmpty } from "react-icons/im";
+import { IconRenderer } from "../../libs/iconMapping";
+
 const CategoryBreakdown = ({ data, formatCurrency }) => {
   if (!data || data.length === 0) {
     return (
@@ -6,7 +9,9 @@ const CategoryBreakdown = ({ data, formatCurrency }) => {
           Gasto por categoría
         </h3>
         <div className="empty-widget">
-          <div className="empty-icon">🏷️</div>
+          <div className="empty-icon">
+            <ImFileEmpty />
+          </div>
           <p className="md-typescale-body-medium">
             No hay categorías que mostrar
           </p>
@@ -37,7 +42,7 @@ const CategoryBreakdown = ({ data, formatCurrency }) => {
                   className="category-icon"
                   style={{ backgroundColor: category.color }}
                 >
-                  {category.icon}
+                  <IconRenderer iconId={category.icon} />
                 </span>
                 <div className="category-details">
                   <span className="category-name md-typescale-body-medium">

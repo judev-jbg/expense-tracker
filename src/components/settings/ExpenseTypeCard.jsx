@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { MdEdit } from "react-icons/md";
 import { IoTrash } from "react-icons/io5";
+import { IconRenderer } from "../../libs/iconMapping";
 
 const ExpenseTypeCard = ({ expenseType, onEdit, onDelete }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -21,7 +22,7 @@ const ExpenseTypeCard = ({ expenseType, onEdit, onDelete }) => {
             className="type-icon"
             style={{ backgroundColor: expenseType.color }}
           >
-            {expenseType.icon}
+            <IconRenderer iconId={expenseType.icon} />
           </span>
         </div>
         <div className="card-menu">

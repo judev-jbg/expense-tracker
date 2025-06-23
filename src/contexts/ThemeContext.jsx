@@ -78,7 +78,6 @@ export const ThemeProvider = ({ children }) => {
     if (user) {
       try {
         await userPreferencesService.update({ theme: newTheme });
-        console.log("Theme saved to database:", newTheme);
       } catch (error) {
         console.error("Error saving theme to database:", error);
         // Theme still works from localStorage even if database sync fails

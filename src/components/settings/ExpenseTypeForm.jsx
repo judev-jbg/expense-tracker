@@ -1,81 +1,61 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Button from "../common/Button";
-import { AiFillHome } from "react-icons/ai";
-import {
-  MdFlatware,
-  MdLightbulb,
-  MdDirectionsBus,
-  MdGasMeter,
-} from "react-icons/md";
-import { IoFastFoodSharp, IoGameController } from "react-icons/io5";
-import { RiGasStationFill } from "react-icons/ri";
-import { FaCarSide } from "react-icons/fa6";
-import { FaGraduationCap } from "react-icons/fa6";
-import { IoIosCard, IoIosWater } from "react-icons/io";
-import { PiFilmSlateFill } from "react-icons/pi";
-import { FaMobile, FaStore } from "react-icons/fa";
-import { TbTargetArrow, TbPillFilled } from "react-icons/tb";
-import { BsFillSuitcase2Fill } from "react-icons/bs";
-import { GiElectric } from "react-icons/gi";
+import { COMMON_ICONS, IconRenderer } from "../../libs/iconMapping";
 
 const ExpenseTypeForm = ({ expenseType, onSubmit, onCancel, isEditing }) => {
+  const [selectedIconId, setSelectedIconId] = useState("card");
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
     watch,
+    setValue,
   } = useForm({
     defaultValues: {
       name: "",
       description: "",
-      icon: <IoIosCard />,
+      icon: "card",
       color: "#6750a4",
     },
   });
 
   const watchedColor = watch("color");
+  const watchedIcon = watch("icon");
 
   useEffect(() => {
     if (expenseType) {
+      const iconId = expenseType.icon || "card";
+      setSelectedIconId(iconId);
       reset({
         name: expenseType.name || "",
         description: expenseType.description || "",
-        icon: expenseType.icon || <IoIosCard />,
+        icon: iconId,
         color: expenseType.color || "#6750a4",
       });
     }
   }, [expenseType, reset]);
 
+  useEffect(() => {
+    if (watchedIcon) {
+      setSelectedIconId(watchedIcon);
+    }
+  }, [watchedIcon]);
+
   const onFormSubmit = async (data) => {
     const success = await onSubmit(data);
-    if (success) {
+    if (success && !isEditing) {
       reset();
+      setSelectedIconId("card");
     }
   };
 
-  const commonIcons = [
-    <MdLightbulb />,
-    <IoIosWater />,
-    <MdGasMeter />,
-    <GiElectric />,
-    <MdFlatware />,
-    <FaStore />,
-    <IoFastFoodSharp />,
-    <FaCarSide />,
-    <IoIosCard />,
-    <PiFilmSlateFill />,
-    <AiFillHome />,
-    <FaMobile />,
-    <RiGasStationFill />,
-    <MdDirectionsBus />,
-    <TbTargetArrow />,
-    <TbPillFilled />,
-    <FaGraduationCap />,
-    <BsFillSuitcase2Fill />,
-    <IoGameController />,
-  ];
+  const handleIconSelect = (iconId) => {
+    setSelectedIconId(iconId);
+    setValue("icon", iconId);
+  };
 
   return (
     <div className="expense-type-form md-card">
@@ -95,7 +75,7 @@ const ExpenseTypeForm = ({ expenseType, onSubmit, onCancel, isEditing }) => {
               id="name"
               type="text"
               className={`md-text-field-input ${errors.name ? "error" : ""}`}
-              placeholder="ej. Comida & Comerdores, Servicios, Suscripciones"
+              placeholder="ej. Comida & Comedores, Servicios, Suscripciones"
               {...register("name", {
                 required: "El nombre es obligatorio",
                 minLength: {
@@ -147,17 +127,25 @@ const ExpenseTypeForm = ({ expenseType, onSubmit, onCancel, isEditing }) => {
         <div className="form-row form-row-split">
           <div className="md-text-field">
             <label htmlFor="icon" className="md-text-field-label">
-              Icono
+              Icono seleccionado
             </label>
+            <div className="selected-icon-display">
+              <div
+                className="icon-preview"
+                style={{ backgroundColor: watchedColor }}
+              >
+                <IconRenderer iconId={selectedIconId} />
+              </div>
+              <span className="selected-icon-name">
+                {COMMON_ICONS.find((icon) => icon.id === selectedIconId)
+                  ?.name || "Seleccionar icono"}
+              </span>
+            </div>
             <input
-              id="icon"
-              type="text"
-              className={`md-text-field-input ${errors.icon ? "error" : ""}`}
-              placeholder={<IoIosCard />}
+              type="hidden"
               {...register("icon", {
                 required: "El icono es obligatorio",
               })}
-              disabled={isSubmitting}
             />
             {errors.icon && (
               <span className="md-text-field-error">{errors.icon.message}</span>
@@ -178,10 +166,6 @@ const ExpenseTypeForm = ({ expenseType, onSubmit, onCancel, isEditing }) => {
                 })}
                 disabled={isSubmitting}
               />
-              {/* <div
-                className="color-preview"
-                style={{ backgroundColor: watchedColor }}
-              /> */}
             </div>
             {errors.color && (
               <span className="md-text-field-error">
@@ -192,19 +176,20 @@ const ExpenseTypeForm = ({ expenseType, onSubmit, onCancel, isEditing }) => {
         </div>
 
         <div className="icon-selector">
-          <label className="md-text-field-label">
-            Selección rápida de iconos
-          </label>
+          <label className="md-text-field-label">Selección de iconos</label>
           <div className="icon-grid">
-            {commonIcons.map((icon, index) => (
+            {COMMON_ICONS.map((icon) => (
               <button
-                key={index}
+                key={icon.id}
                 type="button"
-                className="icon-option"
-                onClick={() => reset({ ...watch(), icon })}
+                className={`icon-option ${
+                  selectedIconId === icon.id ? "selected" : ""
+                }`}
+                onClick={() => handleIconSelect(icon.id)}
                 disabled={isSubmitting}
+                title={icon.name}
               >
-                {icon}
+                <icon.component />
               </button>
             ))}
           </div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { IoTrash } from "react-icons/io5";
 import { MdModeEditOutline } from "react-icons/md";
 import { IoMdPricetags } from "react-icons/io";
+import { IconRenderer } from "../../libs/iconMapping";
 
 const ExpenseCard = ({ expense, onEdit, onDelete, onView }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -67,7 +68,7 @@ const ExpenseCard = ({ expense, onEdit, onDelete, onView }) => {
             className="type-badge"
             style={{ backgroundColor: expense.expense_types.color }}
           >
-            {expense.expense_types.icon}
+            <IconRenderer iconId={expense.expense_types.icon} />
           </span>
           <div className="type-details">
             <span className="type-name md-typescale-body-medium">
