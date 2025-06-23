@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ExpenseCard from "./ExpenseCard";
 import Spinner from "../common/Spinner";
+import { GrMoney } from "react-icons/gr";
 
 const ExpensesList = ({ expenses, onEdit, onDelete, onView, loading }) => {
   const [sortBy, setSortBy] = useState("date");
@@ -84,7 +85,9 @@ const ExpensesList = ({ expenses, onEdit, onDelete, onView, loading }) => {
   if (expenses.length === 0) {
     return (
       <div className="empty-expenses md-card">
-        <div className="empty-icon">💸</div>
+        <div className="empty-icon">
+          <GrMoney />
+        </div>
         <h3 className="md-typescale-title-medium">No hay gastos</h3>
         <p className="md-typescale-body-medium">
           Empieza a controlar tus gastos añadiendo el primero.

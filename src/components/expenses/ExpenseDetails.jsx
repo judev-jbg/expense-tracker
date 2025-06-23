@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { googleDriveService } from "../../libs/googleDriveService";
+import { IoDocumentTextOutline, IoTrash } from "react-icons/io5";
+import { IoMdImages, IoMdClose } from "react-icons/io";
+import { FaRegFilePdf, FaRegFileWord, FaRegFileExcel } from "react-icons/fa";
+import { FaBuildingColumns } from "react-icons/fa6";
+import { ImMobile } from "react-icons/im";
+import { MdEdit, MdEmail } from "react-icons/md";
+import { BiWorld } from "react-icons/bi";
 
 const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -41,16 +47,16 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
   };
 
   const getFileIcon = (mimeType) => {
-    if (!mimeType) return "📄";
+    if (!mimeType) return <IoDocumentTextOutline />;
 
-    if (mimeType.startsWith("image/")) return "🖼️";
-    if (mimeType.includes("pdf")) return "📕";
-    if (mimeType.includes("word") || mimeType.includes("document")) return "📘";
-    if (mimeType.includes("sheet") || mimeType.includes("excel")) return "📗";
-    if (mimeType.includes("presentation") || mimeType.includes("powerpoint"))
-      return "📙";
+    if (mimeType.startsWith("image/")) return <IoMdImages />;
+    if (mimeType.includes("pdf")) return <FaRegFilePdf />;
+    if (mimeType.includes("word") || mimeType.includes("document"))
+      return <FaRegFileWord />;
+    if (mimeType.includes("sheet") || mimeType.includes("excel"))
+      return <FaRegFileExcel />;
 
-    return "📄";
+    return <IoDocumentTextOutline />;
   };
 
   const formatFileSize = (bytes) => {
@@ -73,7 +79,7 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
               onClick={onClose}
               aria-label="Close details"
             >
-              ✕
+              <IoMdClose />
             </button>
           </div>
 
@@ -82,14 +88,18 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
               className="md-button md-button-outlined"
               onClick={() => onEdit(expense)}
             >
-              <span className="button-icon">✏️</span>
+              <span className="button-icon">
+                <MdEdit />
+              </span>
               Editar
             </button>
             <button
               className="md-button md-button-filled delete-button"
               onClick={() => setShowDeleteConfirm(true)}
             >
-              <span className="button-icon">🗑️</span>
+              <span className="button-icon">
+                <IoTrash />
+              </span>
               Eliminar
             </button>
           </div>
@@ -144,7 +154,9 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
 
               <div className="category-item">
                 <div className="entity-icon-container">
-                  <span className="entity-icon">🏢</span>
+                  <span className="entity-icon">
+                    <FaBuildingColumns />
+                  </span>
                 </div>
                 <div className="category-details">
                   <span className="category-name md-typescale-title-medium">
@@ -172,7 +184,9 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
                   <div className="contact-grid">
                     {expense.entities.contact_info.phone && (
                       <div className="contact-item">
-                        <span className="contact-icon">📞</span>
+                        <span className="contact-icon">
+                          <ImMobile />
+                        </span>
                         <a
                           href={`tel:${expense.entities.contact_info.phone}`}
                           className="contact-link"
@@ -183,7 +197,9 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
                     )}
                     {expense.entities.contact_info.email && (
                       <div className="contact-item">
-                        <span className="contact-icon">📧</span>
+                        <span className="contact-icon">
+                          <MdEmail />
+                        </span>
                         <a
                           href={`mailto:${expense.entities.contact_info.email}`}
                           className="contact-link"
@@ -194,7 +210,9 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
                     )}
                     {expense.entities.contact_info.website && (
                       <div className="contact-item">
-                        <span className="contact-icon">🌐</span>
+                        <span className="contact-icon">
+                          <BiWorld />
+                        </span>
                         <a
                           href={expense.entities.contact_info.website}
                           target="_blank"
