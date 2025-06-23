@@ -130,15 +130,15 @@ const AppRoutes = () => {
 // Main App Component
 const App = () => {
   return (
-    <ThemeProvider>
-      <AuthProvider>
+    <AuthProvider>
+      <ThemeProvider>
         <Router>
           <div className="app-container">
             <AppRoutes />
           </div>
         </Router>
-      </AuthProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 };
 

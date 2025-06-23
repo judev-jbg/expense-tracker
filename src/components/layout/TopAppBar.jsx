@@ -1,6 +1,7 @@
 import { useRef, useEffect } from "react";
 import { MdSunny } from "react-icons/md";
 import { RiMoonFill } from "react-icons/ri";
+import { MdOutlineLogout } from "react-icons/md";
 
 const TopAppBar = ({
   title,
@@ -45,6 +46,11 @@ const TopAppBar = ({
     return "??";
   };
 
+  // Handle theme toggle with database persistence
+  const handleThemeToggle = async () => {
+    await onToggleTheme(); // This now persists to database
+  };
+
   return (
     <header className="md-top-app-bar">
       {/* App Title */}
@@ -62,7 +68,7 @@ const TopAppBar = ({
         {/* Theme Toggle */}
         <button
           className="top-app-bar-action-button"
-          onClick={onToggleTheme}
+          onClick={handleThemeToggle}
           aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
           title={`${theme === "light" ? "Dark" : "Light"} theme`}
         >
@@ -104,9 +110,11 @@ const TopAppBar = ({
 
               <div className="user-menu-actions">
                 <button className="user-menu-item" onClick={onSignOut}>
-                  <span className="menu-item-icon">🚪</span>
+                  <span className="menu-item-icon">
+                    <MdOutlineLogout />
+                  </span>
                   <span className="menu-item-text md-typescale-body-medium">
-                    Sign out
+                    Cerrar sesion
                   </span>
                 </button>
               </div>

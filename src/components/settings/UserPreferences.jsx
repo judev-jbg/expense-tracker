@@ -49,11 +49,10 @@ const UserPreferences = () => {
 
   // Update theme when form theme changes (but only after initial load)
   useEffect(() => {
-    // ← Modificar esta lógica
     if (!initialLoad && watchedTheme && watchedTheme !== theme) {
-      setTheme(watchedTheme);
+      console.log("Theme change detected in form, will save on submit");
     }
-  }, [watchedTheme, theme, setTheme, initialLoad]);
+  }, [watchedTheme, theme, initialLoad]);
 
   const loadData = async () => {
     setLoading(true);

@@ -425,60 +425,29 @@ ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
 
 -- Create user management policies
 DROP POLICY IF EXISTS "Users can view own preferences" ON user_preferences;
+DROP POLICY IF EXISTS "Admins can view all user preferences" ON user_preferences;
 DROP POLICY IF EXISTS "Users can insert own preferences" ON user_preferences;
+DROP POLICY IF EXISTS "Admins can insert user preferences" ON user_preferences;
 DROP POLICY IF EXISTS "Users can update own preferences" ON user_preferences;
-DROP POLICY IF EXISTS "Users can delete own preferences" ON user_preferences;
+DROP POLICY IF EXISTS "Admins can update user preferences" ON user_preferences;
+DROP POLICY IF EXISTS "Admins can delete user preferences" ON user_preferences;
+DROP POLICY IF EXISTS "Enable admin access to all user preferences" ON user_preferences;
 
 -- New RLS policies for user management
-CREATE POLICY "Users can view own preferences" ON user_preferences
+-- Crear políticas simples y seguras
+CREATE POLICY "user_preferences_select_policy" ON user_preferences
     FOR SELECT USING (auth.uid() = user_id);
 
-CREATE POLICY "Admins can view all user preferences" ON user_preferences
-    FOR SELECT USING (
-        EXISTS (
-            SELECT 1 FROM user_preferences up 
-            WHERE up.user_id = auth.uid() 
-            AND up.role = 'admin'
-            AND up.is_active = true
-        )
-    );
-
-CREATE POLICY "Users can insert own preferences" ON user_preferences
+CREATE POLICY "user_preferences_insert_policy" ON user_preferences
     FOR INSERT WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Admins can insert user preferences" ON user_preferences
-    FOR INSERT WITH CHECK (
-        EXISTS (
-            SELECT 1 FROM user_preferences up 
-            WHERE up.user_id = auth.uid() 
-            AND up.role = 'admin'
-            AND up.is_active = true
-        )
-    );
+CREATE POLICY "user_preferences_update_policy" ON user_preferences
+    FOR UPDATE USING (auth.uid() = user_id)
+    WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Users can update own preferences" ON user_preferences
-    FOR UPDATE USING (auth.uid() = user_id);
-
-CREATE POLICY "Admins can update user preferences" ON user_preferences
-    FOR UPDATE USING (
-        EXISTS (
-            SELECT 1 FROM user_preferences up 
-            WHERE up.user_id = auth.uid() 
-            AND up.role = 'admin'
-            AND up.is_active = true
-        )
-    );
-
-CREATE POLICY "Admins can delete user preferences" ON user_preferences
-    FOR DELETE USING (
-        EXISTS (
-            SELECT 1 FROM user_preferences up 
-            WHERE up.user_id = auth.uid() 
-            AND up.role = 'admin'
-            AND up.is_active = true
-        )
-        AND user_id != auth.uid() -- Admins can't delete themselves
-    );
+-- No permitir delete de preferencias de usuario (opcional)
+CREATE POLICY "user_preferences_delete_policy" ON user_preferences
+    FOR DELETE USING (auth.uid() = user_id);
 
 -- Function to check if user is admin
 CREATE OR REPLACE FUNCTION is_admin(user_uuid UUID DEFAULT auth.uid())
