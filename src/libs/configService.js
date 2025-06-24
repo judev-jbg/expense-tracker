@@ -310,8 +310,6 @@ export const expensesService = {
         ascending: false,
       });
 
-      console.log(data);
-
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
