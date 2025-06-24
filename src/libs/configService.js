@@ -493,62 +493,6 @@ export const expensesService = {
     }
   },
 };
-// Expense documents service
-export const expenseDocumentsService = {
-  // Get documents for an expense
-  getByExpenseId: async (expenseId) => {
-    try {
-      const { data, error } = await supabase
-        .from("expense_documents")
-        .select("*")
-        .eq("expense_id", expenseId)
-        .order("uploaded_at", { ascending: false });
-
-      if (error) throw error;
-      return { data, error: null };
-    } catch (error) {
-      return { data: null, error: error.message };
-    }
-  },
-
-  // Add document to expense
-  create: async (documentData) => {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      const { data, error } = await supabase
-        .from("expense_documents")
-        .insert({
-          ...documentData,
-          uploaded_by: user.id,
-        })
-        .select();
-
-      if (error) throw error;
-      return { data: data[0], error: null };
-    } catch (error) {
-      return { data: null, error: error.message };
-    }
-  },
-
-  // Delete document
-  delete: async (id) => {
-    try {
-      const { error } = await supabase
-        .from("expense_documents")
-        .delete()
-        .eq("id", id);
-
-      if (error) throw error;
-      return { error: null };
-    } catch (error) {
-      return { error: error.message };
-    }
-  },
-};
 export const dashboardService = {
   // Get dashboard summary for a specific period
   getDashboardData: async (year, month = null) => {
@@ -1052,6 +996,82 @@ export const userManagementService = {
 
       if (error) throw error;
       return { data, error: null };
+    } catch (error) {
+      return { data: null, error: error.message };
+    }
+  },
+};
+// Expense documents service actualizado
+export const expenseDocumentsService = {
+  // Get documents for an expense
+  getByExpenseId: async (expenseId) => {
+    try {
+      const { data, error } = await supabase
+        .from("expense_documents")
+        .select("*")
+        .eq("expense_id", expenseId)
+        .order("uploaded_at", { ascending: false });
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error: error.message };
+    }
+  },
+
+  // Add document to expense
+  create: async (documentData) => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { data, error } = await supabase
+        .from("expense_documents")
+        .insert({
+          ...documentData,
+          uploaded_by: user.id,
+        })
+        .select();
+
+      if (error) throw error;
+      return { data: data[0], error: null };
+    } catch (error) {
+      return { data: null, error: error.message };
+    }
+  },
+
+  // Delete document
+  delete: async (id) => {
+    try {
+      const { error } = await supabase
+        .from("expense_documents")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
+
+  // Mark document as unavailable (soft delete)
+  markUnavailable: async (id, reason = "manual_deletion") => {
+    try {
+      const { data, error } = await supabase
+        .from("expense_documents")
+        .update({
+          is_available: false,
+          deleted_at: new Date().toISOString(),
+          deletion_reason: reason,
+        })
+        .eq("id", id)
+        .select();
+
+      if (error) throw error;
+      return { data: data[0], error: null };
     } catch (error) {
       return { data: null, error: error.message };
     }

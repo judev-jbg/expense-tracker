@@ -3,16 +3,22 @@ import { FaCloudArrowUp } from "react-icons/fa6";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { IoMdImages } from "react-icons/io";
 import { FaRegFilePdf, FaRegFileWord, FaRegFileExcel } from "react-icons/fa";
+import { storageService } from "../../libs/storageService";
+import { expenseDocumentsService } from "../../libs/configService";
+import { useAuth } from "../../contexts/AuthContext";
 
 const FileUpload = ({
+  expenseId,
   onFileUpload,
   uploadedFiles = [],
   onFileRemove,
   disabled = false,
 }) => {
+  const { user } = useAuth();
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState([]);
   const [uploadProgress, setUploadProgress] = useState({});
+  const [storageInfo, setStorageInfo] = useState(null);
   const fileInputRef = useRef(null);
 
   const acceptedTypes = [
@@ -30,6 +36,22 @@ const FileUpload = ({
 
   const maxFileSize = 10 * 1024 * 1024; // 10MB
   const maxFiles = 10;
+
+  const loadStorageInfo = async () => {
+    if (!user) return;
+
+    const result = await storageService.getStorageStats(user.id);
+    if (!result.error) {
+      setStorageInfo(result.data);
+    }
+  };
+
+  // Cargar información de almacenamiento al montar el componente
+  useState(() => {
+    if (user) {
+      loadStorageInfo();
+    }
+  }, [user]);
 
   const validateFile = (file) => {
     const errors = [];
@@ -104,7 +126,6 @@ const FileUpload = ({
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
     handleFiles(files);
-    // Reset input value to allow selecting the same file again
     e.target.value = "";
   };
 
@@ -132,7 +153,16 @@ const FileUpload = ({
 
     if (validFiles.length === 0) return;
 
-    // Start uploading files
+    // Verificar espacio antes de empezar
+    const spaceCheck = await storageService.checkStorageSpace(user.id);
+    if (!spaceCheck.canUpload) {
+      alert(
+        `Espacio insuficiente. Uso actual: ${spaceCheck.usagePercentage}%. Por favor, libere espacio eliminando archivos antiguos.`
+      );
+      return;
+    }
+
+    // Subir archivos
     const uploadPromises = validFiles.map((file) => uploadFile(file));
 
     try {
@@ -141,17 +171,19 @@ const FileUpload = ({
 
       if (successfulUploads.length > 0) {
         onFileUpload(successfulUploads.map((result) => result.data));
+        await loadStorageInfo(); // Actualizar info de almacenamiento
       }
 
       const failedUploads = results.filter((result) => result.error);
       if (failedUploads.length > 0) {
         alert(
-          `${failedUploads.length} Archivo(s) no cargado(s). Algunos archivos no pudieron ser cargados`
+          `${failedUploads.length} archivo(s) no se pudieron cargar:\n` +
+            failedUploads.map((f) => f.error).join("\n")
         );
       }
     } catch (error) {
       console.error("Upload error:", error);
-      alert("Carga fallida. Por favor, inténtelo de nuevo.");
+      alert("Error durante la carga. Por favor, inténtelo de nuevo.");
     }
   };
 
@@ -161,18 +193,51 @@ const FileUpload = ({
     setUploadProgress((prev) => ({ ...prev, [fileId]: 0 }));
 
     try {
-      // Simulate upload progress
+      // Simular progreso inicial
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => ({
           ...prev,
-          [fileId]: Math.min(prev[fileId] + Math.random() * 30, 90),
+          [fileId]: Math.min(prev[fileId] + Math.random() * 20, 70),
         }));
       }, 200);
 
+      // Subir a Supabase Storage
+      const uploadResult = await storageService.uploadFile(
+        file,
+        expenseId,
+        user.id
+      );
+
       clearInterval(progressInterval);
+      setUploadProgress((prev) => ({ ...prev, [fileId]: 90 }));
+
+      if (uploadResult.error) {
+        throw new Error(uploadResult.error);
+      }
+
+      // Guardar metadata en la base de datos
+      const documentData = {
+        expense_id: expenseId,
+        file_name: file.name,
+        file_size: file.size,
+        mime_type: file.type,
+        storage_path: uploadResult.data.path,
+        storage_bucket: "expense-documents",
+        is_receipt: true,
+        is_available: true,
+      };
+
+      const dbResult = await expenseDocumentsService.create(documentData);
+
+      if (dbResult.error) {
+        // Si falla guardar en DB, eliminar archivo de storage
+        await storageService.deleteFile(uploadResult.data.path);
+        throw new Error(dbResult.error);
+      }
+
       setUploadProgress((prev) => ({ ...prev, [fileId]: 100 }));
 
-      // Clean up after a short delay
+      // Limpiar después de un delay
       setTimeout(() => {
         setUploading((prev) => prev.filter((id) => id !== fileId));
         setUploadProgress((prev) => {
@@ -182,7 +247,14 @@ const FileUpload = ({
         });
       }, 1000);
 
-      return result;
+      return {
+        data: {
+          ...dbResult.data,
+          url: uploadResult.data.url,
+          storage_url: uploadResult.data.url,
+        },
+        error: null,
+      };
     } catch (error) {
       setUploading((prev) => prev.filter((id) => id !== fileId));
       setUploadProgress((prev) => {
@@ -194,7 +266,21 @@ const FileUpload = ({
     }
   };
 
-  const handleRemoveFile = (index) => {
+  const handleRemoveFile = async (index) => {
+    const file = uploadedFiles[index];
+
+    if (file.storage_path) {
+      // Eliminar de Supabase Storage
+      await storageService.deleteFile(file.storage_path);
+
+      // Eliminar de la base de datos
+      if (file.id) {
+        await expenseDocumentsService.delete(file.id);
+      }
+
+      await loadStorageInfo(); // Actualizar info de almacenamiento
+    }
+
     onFileRemove(index);
   };
 
@@ -206,6 +292,34 @@ const FileUpload = ({
 
   return (
     <div className="file-upload-container">
+      {/* Storage Info */}
+      {storageInfo && (
+        <div className="storage-info-bar">
+          <div className="storage-usage">
+            <span className="storage-label">Almacenamiento usado:</span>
+            <span className="storage-value">
+              {formatFileSize(storageInfo.total_size)} /{" "}
+              {formatFileSize(storageInfo.storage_limit)}(
+              {storageInfo.usage_percentage}%)
+            </span>
+          </div>
+          <div className="storage-progress-bar">
+            <div
+              className="storage-progress-fill"
+              style={{
+                width: `${Math.min(storageInfo.usage_percentage, 100)}%`,
+                backgroundColor:
+                  storageInfo.usage_percentage > 85
+                    ? "#f44336"
+                    : storageInfo.usage_percentage > 70
+                    ? "#ff9800"
+                    : "#4caf50",
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Upload Area */}
       <div
         className={`file-upload-dropzone ${isDragging ? "dragging" : ""} ${
@@ -238,9 +352,15 @@ const FileUpload = ({
                 : "Arrastre y suelte los archivos aquí, o haga clic para seleccionarlos"}
             </p>
             <p className="md-typescale-body-small upload-help-text">
-              Soporta: Imágenes, documentos PDF, Word y Excel (maximo{" "}
+              Soporta: Imágenes, documentos PDF, Word y Excel (máximo{" "}
               {formatFileSize(maxFileSize)} cada archivo)
             </p>
+            {storageInfo && storageInfo.usage_percentage > 70 && (
+              <p className="md-typescale-body-small upload-warning-text">
+                ⚠️ Almacenamiento al {storageInfo.usage_percentage}%. Los
+                archivos antiguos se eliminarán automáticamente si es necesario.
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -283,6 +403,9 @@ const FileUpload = ({
                 <div className="file-info">
                   <span className="file-name md-typescale-body-medium">
                     {file.file_name || file.name}
+                    {!file.is_available && (
+                      <span className="file-unavailable"> (No disponible)</span>
+                    )}
                   </span>
                   <div className="file-meta">
                     {(file.file_size || file.size) && (
@@ -290,10 +413,12 @@ const FileUpload = ({
                         {formatFileSize(file.file_size || file.size)}
                       </span>
                     )}
-                    {file.url && (
+                    {file.is_available && (file.url || file.storage_url) && (
                       <button
                         className="file-view-button"
-                        onClick={() => window.open(file.url, "_blank")}
+                        onClick={() =>
+                          window.open(file.url || file.storage_url, "_blank")
+                        }
                         title="Ver archivo"
                       >
                         👁️
@@ -305,7 +430,7 @@ const FileUpload = ({
                   className="file-remove-button"
                   onClick={() => handleRemoveFile(index)}
                   disabled={disabled}
-                  title="Remove file"
+                  title="Eliminar archivo"
                 >
                   ✕
                 </button>
@@ -318,8 +443,12 @@ const FileUpload = ({
       {/* File Limits Info */}
       <div className="upload-limits-info">
         <p className="md-typescale-body-small upload-limits-text">
-          Máximo {maxFiles} archivos por gasto <br /> Máximo{" "}
+          Máximo {maxFiles} archivos por gasto • Máximo{" "}
           {formatFileSize(maxFileSize)} por archivo
+          <br />
+          <strong>Gestión inteligente:</strong> ~28.5MB/mes promedio • Los
+          archivos antiguos se eliminan automáticamente cuando el espacio es
+          limitado
         </p>
       </div>
     </div>

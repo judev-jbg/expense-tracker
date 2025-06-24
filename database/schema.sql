@@ -579,3 +579,152 @@ CREATE POLICY "Only admins can view user management" ON user_management_view
     FOR SELECT USING (is_admin());
 
 COMMENT ON VIEW user_management_view IS 'View for user management - only accessible by admins';
+
+-- =====================================================
+-- SUPABASE STORAGE CONFIGURATION
+-- =====================================================
+
+-- 1. Crear bucket para documentos de gastos
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'expense-documents',
+  'expense-documents',
+  false, -- Privado
+  10485760, -- 10MB límite por archivo
+  ARRAY['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']::text[]
+);
+
+-- 2. Políticas RLS para el bucket
+CREATE POLICY "Users can upload their own expense documents" 
+ON storage.objects FOR INSERT 
+WITH CHECK (
+  bucket_id = 'expense-documents' 
+  AND auth.uid()::text = (storage.foldername(name))[1]
+);
+
+CREATE POLICY "Users can view their own expense documents" 
+ON storage.objects FOR SELECT 
+USING (
+  bucket_id = 'expense-documents' 
+  AND auth.uid()::text = (storage.foldername(name))[1]
+);
+
+CREATE POLICY "Users can delete their own expense documents" 
+ON storage.objects FOR DELETE 
+USING (
+  bucket_id = 'expense-documents' 
+  AND auth.uid()::text = (storage.foldername(name))[1]
+);
+
+-- 3. Función para obtener estadísticas de storage por usuario
+CREATE OR REPLACE FUNCTION get_user_storage_stats(user_uuid UUID DEFAULT auth.uid())
+RETURNS JSON AS $$
+DECLARE
+    total_size BIGINT;
+    file_count INTEGER;
+    oldest_file_date TIMESTAMP;
+    storage_limit BIGINT := 1073741824; -- 1GB in bytes
+    result JSON;
+BEGIN
+    -- Obtener estadísticas
+    SELECT 
+        COALESCE(SUM(metadata->>'size')::BIGINT, 0),
+        COUNT(*),
+        MIN(created_at)
+    INTO total_size, file_count, oldest_file_date
+    FROM storage.objects 
+    WHERE bucket_id = 'expense-documents' 
+    AND (storage.foldername(name))[1] = user_uuid::text;
+    
+    -- Crear resultado JSON
+    result := json_build_object(
+        'total_size', total_size,
+        'file_count', file_count,
+        'oldest_file_date', oldest_file_date,
+        'storage_limit', storage_limit,
+        'usage_percentage', ROUND((total_size::DECIMAL / storage_limit) * 100, 2),
+        'available_space', storage_limit - total_size
+    );
+    
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 4. Función para limpiar archivos antiguos cuando se acerca al límite
+CREATE OR REPLACE FUNCTION cleanup_old_files(user_uuid UUID DEFAULT auth.uid())
+RETURNS JSON AS $$
+DECLARE
+    storage_limit BIGINT := 1073741824; -- 1GB
+    current_usage BIGINT;
+    cleanup_threshold DECIMAL := 0.9; -- 90% del límite
+    files_to_delete RECORD;
+    deleted_count INTEGER := 0;
+    space_freed BIGINT := 0;
+BEGIN
+    -- Obtener uso actual
+    SELECT (get_user_storage_stats(user_uuid)->>'total_size')::BIGINT INTO current_usage;
+    
+    -- Si está por encima del 90%, empezar limpieza
+    IF current_usage > (storage_limit * cleanup_threshold) THEN
+        -- Eliminar archivos más antiguos hasta llegar al 70%
+        FOR files_to_delete IN
+            SELECT name, (metadata->>'size')::BIGINT as file_size
+            FROM storage.objects 
+            WHERE bucket_id = 'expense-documents' 
+            AND (storage.foldername(name))[1] = user_uuid::text
+            ORDER BY created_at ASC
+        LOOP
+            -- Eliminar archivo de storage
+            DELETE FROM storage.objects 
+            WHERE bucket_id = 'expense-documents' 
+            AND name = files_to_delete.name;
+            
+            -- Marcar documento como eliminado en expense_documents
+            UPDATE expense_documents 
+            SET 
+                is_available = false,
+                deleted_at = NOW(),
+                deletion_reason = 'storage_cleanup'
+            WHERE storage_path = files_to_delete.name;
+            
+            deleted_count := deleted_count + 1;
+            space_freed := space_freed + files_to_delete.file_size;
+            current_usage := current_usage - files_to_delete.file_size;
+            
+            -- Parar cuando lleguemos al 70% del límite
+            EXIT WHEN current_usage <= (storage_limit * 0.7);
+        END LOOP;
+    END IF;
+    
+    RETURN json_build_object(
+        'deleted_files', deleted_count,
+        'space_freed_bytes', space_freed,
+        'space_freed_mb', ROUND(space_freed::DECIMAL / 1048576, 2),
+        'new_usage_percentage', ROUND((current_usage::DECIMAL / storage_limit) * 100, 2)
+    );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- =====================================================
+-- UPDATE EXPENSE_DOCUMENTS TABLE
+-- =====================================================
+
+-- Agregar campos para gestión de archivos
+ALTER TABLE expense_documents 
+ADD COLUMN IF NOT EXISTS storage_path TEXT,
+ADD COLUMN IF NOT EXISTS storage_bucket TEXT DEFAULT 'expense-documents',
+ADD COLUMN IF NOT EXISTS is_available BOOLEAN DEFAULT true,
+ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE,
+ADD COLUMN IF NOT EXISTS deletion_reason TEXT;
+
+-- Migrar datos existentes (si los hay)
+UPDATE expense_documents 
+SET 
+    storage_path = google_drive_file_id,
+    is_available = true
+WHERE storage_path IS NULL;
+
+-- Índices para optimizar consultas
+CREATE INDEX IF NOT EXISTS idx_expense_documents_storage_path ON expense_documents(storage_path);
+CREATE INDEX IF NOT EXISTS idx_expense_documents_is_available ON expense_documents(is_available);
+CREATE INDEX IF NOT EXISTS idx_expense_documents_uploaded_at ON expense_documents(uploaded_at);
