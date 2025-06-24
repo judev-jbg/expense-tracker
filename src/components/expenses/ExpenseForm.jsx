@@ -1,3 +1,5 @@
+// En src/components/expenses/ExpenseForm.jsx
+
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import FileUpload from "./FileUpload";
@@ -15,6 +17,7 @@ const ExpenseForm = ({
   const [selectedTypeId, setSelectedTypeId] = useState("");
   const [filteredEntities, setFilteredEntities] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [tempFiles, setTempFiles] = useState([]); // Archivos temporales para nuevo gasto
 
   const {
     register,
@@ -39,7 +42,7 @@ const ExpenseForm = ({
 
   useEffect(() => {
     if (expense) {
-      // Format date for input
+      // Formato de fecha para input
       const expenseDate = new Date(expense.expense_date);
       const formattedDate = expenseDate.toISOString().split("T")[0];
 
@@ -59,6 +62,8 @@ const ExpenseForm = ({
       // Set default date to today
       const today = new Date().toISOString().split("T")[0];
       setValue("expense_date", today);
+      setUploadedFiles([]);
+      setTempFiles([]);
     }
   }, [expense, reset, setValue]);
 
@@ -103,21 +108,33 @@ const ExpenseForm = ({
       amount,
       tags: tags.length > 0 ? tags : null,
       notes: data.notes || null,
+      tempFiles: tempFiles, // Pasar archivos temporales para nuevo gasto
     };
 
     const success = await onSubmit(submitData);
     if (success && !isEditing) {
       reset();
       setUploadedFiles([]);
+      setTempFiles([]);
     }
   };
 
   const handleFileUpload = (files) => {
-    setUploadedFiles([...uploadedFiles, ...files]);
+    if (isEditing && expense?.id) {
+      // Para gastos existentes, usar el flujo normal
+      setUploadedFiles([...uploadedFiles, ...files]);
+    } else {
+      // Para nuevos gastos, almacenar temporalmente
+      setTempFiles([...tempFiles, ...files]);
+    }
   };
 
   const handleFileRemove = (fileIndex) => {
-    setUploadedFiles(uploadedFiles.filter((_, index) => index !== fileIndex));
+    if (isEditing && expense?.id) {
+      setUploadedFiles(uploadedFiles.filter((_, index) => index !== fileIndex));
+    } else {
+      setTempFiles(tempFiles.filter((_, index) => index !== fileIndex));
+    }
   };
 
   // Quick amount buttons
@@ -144,6 +161,8 @@ const ExpenseForm = ({
       </div>
 
       <form onSubmit={handleSubmit(onFormSubmit)} className="form-content">
+        {/* ... resto de los campos del formulario ... */}
+
         {/* Amount and Date Row */}
         <div className="form-row form-row-split">
           <div className="md-text-field">
@@ -368,12 +387,29 @@ const ExpenseForm = ({
           <h4 className="md-typescale-title-small section-title">
             Recibos y documentos
           </h4>
-          <FileUpload
-            onFileUpload={handleFileUpload}
-            uploadedFiles={uploadedFiles}
-            onFileRemove={handleFileRemove}
-            disabled={isSubmitting}
-          />
+          {isEditing && expense?.id ? (
+            // Para edición, usar el expense ID real
+            <FileUpload
+              expenseId={expense.id}
+              onFileUpload={handleFileUpload}
+              uploadedFiles={uploadedFiles}
+              onFileRemove={handleFileRemove}
+              disabled={isSubmitting}
+            />
+          ) : (
+            // Para nuevo gasto, mostrar solo la interfaz sin funcionalidad de subida
+            <div className="temp-file-upload">
+              <div className="upload-notice">
+                <p className="md-typescale-body-medium">
+                  📎 Los archivos se podrán subir después de crear el gasto
+                </p>
+                <p className="md-typescale-body-small">
+                  Una vez creado el gasto, podrás editarlo para añadir recibos y
+                  documentos
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Form Actions */}

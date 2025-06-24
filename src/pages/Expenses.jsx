@@ -71,7 +71,9 @@ const Expenses = () => {
   };
 
   const handleCreate = async (formData) => {
-    const { data, error } = await expensesService.create(formData);
+    const { tempFiles, ...expenseData } = formData; // Separar archivos temporales
+
+    const { data, error } = await expenseService.create(expenseData);
 
     if (error) {
       setError(error);
@@ -80,6 +82,15 @@ const Expenses = () => {
       setExpenses([data, ...expenses]);
       setShowForm(false);
       setError("");
+
+      // Si hay archivos temporales, mostrar mensaje o redirigir a edición
+      if (tempFiles && tempFiles.length > 0) {
+        // Aquí podrías mostrar un mensaje o redirigir automáticamente a edición
+        alert(
+          `Gasto creado exitosamente. ${tempFiles.length} archivo(s) pendiente(s) de subir. Ve a editar el gasto para añadir los documentos.`
+        );
+      }
+
       return true;
     }
   };

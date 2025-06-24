@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FaCloudArrowUp } from "react-icons/fa6";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { IoMdImages } from "react-icons/io";
@@ -19,6 +19,7 @@ const FileUpload = ({
   const [uploading, setUploading] = useState([]);
   const [uploadProgress, setUploadProgress] = useState({});
   const [storageInfo, setStorageInfo] = useState(null);
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
 
   const acceptedTypes = [
@@ -37,21 +38,47 @@ const FileUpload = ({
   const maxFileSize = 10 * 1024 * 1024; // 10MB
   const maxFiles = 10;
 
-  const loadStorageInfo = async () => {
-    if (!user) return;
-
-    const result = await storageService.getStorageStats(user.id);
-    if (!result.error) {
-      setStorageInfo(result.data);
-    }
-  };
-
   // Cargar información de almacenamiento al montar el componente
-  useState(() => {
+  useEffect(() => {
     if (user) {
       loadStorageInfo();
     }
   }, [user]);
+
+  const loadStorageInfo = async () => {
+    if (!user) return;
+
+    setLoading(true);
+    try {
+      const result = await storageService.getStorageStats(user.id);
+      if (!result.error) {
+        console.log("Storage info loaded:", result.data);
+        setStorageInfo(result.data);
+      } else {
+        console.error("Error loading storage info:", result.error);
+        // Establecer valores por defecto si hay error
+        setStorageInfo({
+          total_size: 0,
+          file_count: 0,
+          storage_limit: 1073741824, // 1GB
+          usage_percentage: 0,
+          available_space: 1073741824,
+        });
+      }
+    } catch (error) {
+      console.error("Exception loading storage info:", error);
+      // Establecer valores por defecto si hay excepción
+      setStorageInfo({
+        total_size: 0,
+        file_count: 0,
+        storage_limit: 1073741824, // 1GB
+        usage_percentage: 0,
+        available_space: 1073741824,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const validateFile = (file) => {
     const errors = [];
@@ -72,6 +99,7 @@ const FileUpload = ({
   };
 
   const formatFileSize = (bytes) => {
+    if (bytes === 0) return "0 GB";
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + " " + sizes[i];
@@ -156,8 +184,11 @@ const FileUpload = ({
     // Verificar espacio antes de empezar
     const spaceCheck = await storageService.checkStorageSpace(user.id);
     if (!spaceCheck.canUpload) {
+      const usageText = spaceCheck.usagePercentage
+        ? `${spaceCheck.usagePercentage}%`
+        : "desconocido";
       alert(
-        `Espacio insuficiente. Uso actual: ${spaceCheck.usagePercentage}%. Por favor, libere espacio eliminando archivos antiguos.`
+        `Espacio insuficiente. Uso actual: ${usageText}. Por favor, libere espacio eliminando archivos antiguos.`
       );
       return;
     }
@@ -293,13 +324,13 @@ const FileUpload = ({
   return (
     <div className="file-upload-container">
       {/* Storage Info */}
-      {storageInfo && (
+      {storageInfo && !loading && (
         <div className="storage-info-bar">
           <div className="storage-usage">
             <span className="storage-label">Almacenamiento usado:</span>
             <span className="storage-value">
               {formatFileSize(storageInfo.total_size)} /{" "}
-              {formatFileSize(storageInfo.storage_limit)}(
+              {formatFileSize(storageInfo.storage_limit)} (
               {storageInfo.usage_percentage}%)
             </span>
           </div>
@@ -443,12 +474,11 @@ const FileUpload = ({
       {/* File Limits Info */}
       <div className="upload-limits-info">
         <p className="md-typescale-body-small upload-limits-text">
-          Máximo {maxFiles} archivos por gasto • Máximo{" "}
+          Máximo {maxFiles} archivos por gasto <br /> Máximo{" "}
           {formatFileSize(maxFileSize)} por archivo
           <br />
-          <strong>Gestión inteligente:</strong> ~28.5MB/mes promedio • Los
-          archivos antiguos se eliminan automáticamente cuando el espacio es
-          limitado
+          Los archivos dejaran de ser visibles automáticamente cuando el espacio
+          es limitado
         </p>
       </div>
     </div>

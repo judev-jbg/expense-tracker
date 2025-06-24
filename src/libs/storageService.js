@@ -134,4 +134,58 @@ export const storageService = {
       return { data: null, error: error.message };
     }
   },
+  // Nueva función para generar URL firmada
+  getSignedUrl: async (path, expiresIn = 3600) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from("expense-documents")
+        .createSignedUrl(path, expiresIn); // URL válida por 1 hora por defecto
+
+      if (error) throw error;
+      return { data: data.signedUrl, error: null };
+    } catch (error) {
+      return { data: null, error: error.message };
+    }
+  },
+
+  // Función para descargar archivo
+  downloadFile: async (path, fileName = null) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from("expense-documents")
+        .download(path);
+
+      if (error) throw error;
+
+      // Crear URL temporal para descarga
+      const url = URL.createObjectURL(data);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName || path.split("/").pop();
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      return { data: true, error: null };
+    } catch (error) {
+      return { data: null, error: error.message };
+    }
+  },
+
+  // Función para verificar si el archivo existe
+  checkFileExists: async (path) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from("expense-documents")
+        .list(path.substring(0, path.lastIndexOf("/")), {
+          search: path.split("/").pop(),
+        });
+
+      if (error) throw error;
+      return { data: data.length > 0, error: null };
+    } catch (error) {
+      return { data: false, error: error.message };
+    }
+  },
 };

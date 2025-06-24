@@ -1,15 +1,20 @@
 import { useState } from "react";
+import Button from "../common/Button";
+import { storageService } from "../../libs/storageService";
+import { IconRenderer } from "../../libs/iconMapping";
 import { IoDocumentTextOutline, IoTrash } from "react-icons/io5";
-import { IoMdImages, IoMdClose } from "react-icons/io";
+import { IoMdImages, IoMdClose, IoMdDownload } from "react-icons/io";
 import { FaRegFilePdf, FaRegFileWord, FaRegFileExcel } from "react-icons/fa";
 import { FaBuildingColumns } from "react-icons/fa6";
 import { ImMobile } from "react-icons/im";
-import { MdEdit, MdEmail } from "react-icons/md";
+import { MdEdit, MdEmail, MdOpenInNew, MdClose } from "react-icons/md";
 import { BiWorld } from "react-icons/bi";
+import { GoStopwatch } from "react-icons/go";
 
 const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [loadingDocument, setLoadingDocument] = useState(null);
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -42,8 +47,109 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
     });
   };
 
-  const handleDocumentClick = (document) => {
-    // Open document in new tab - TODO
+  const handleDocumentClick = async (document) => {
+    if (!document) {
+      alert("Este archivo ya no está disponible. Puede haber sido eliminado.");
+      return;
+    }
+
+    if (!document.storage_path) {
+      console.log(document.storage_path);
+      alert(
+        "No se puede acceder al archivo. Ruta de almacenamiento no encontrada."
+      );
+      return;
+    }
+
+    setLoadingDocument(document.id);
+
+    try {
+      // Verificar si el archivo existe
+      const existsResult = await storageService.checkFileExists(
+        document.storage_path
+      );
+
+      if (!existsResult.data) {
+        alert(
+          "El archivo no se encuentra en el almacenamiento. Es posible que haya sido eliminado."
+        );
+        setLoadingDocument(null);
+        return;
+      }
+
+      // Determinar si abrir en nueva pestaña o descargar según el tipo de archivo
+      const shouldOpenInTab = isViewableInBrowser(document.mime_type);
+
+      if (shouldOpenInTab) {
+        // Generar URL firmada para archivos que se pueden ver en el navegador
+        const urlResult = await storageService.getSignedUrl(
+          document.storage_path,
+          3600
+        );
+
+        if (urlResult.error) {
+          throw new Error(urlResult.error);
+        }
+
+        // Abrir en nueva pestaña
+        const newWindow = window.open(urlResult.data, "_blank");
+
+        if (!newWindow) {
+          // Si el popup fue bloqueado, ofrecer descarga como alternativa
+          const downloadConfirm = confirm(
+            "No se pudo abrir el archivo en una nueva pestaña (popup bloqueado). ¿Deseas descargarlo en su lugar?"
+          );
+
+          if (downloadConfirm) {
+            await downloadDocument(document);
+          }
+        }
+      } else {
+        // Descargar directamente para tipos de archivo que no se pueden ver en el navegador
+        await downloadDocument(document);
+      }
+    } catch (error) {
+      console.error("Error accessing document:", error);
+      alert(`Error al acceder al archivo: ${error.message}`);
+    } finally {
+      setLoadingDocument(null);
+    }
+  };
+
+  const downloadDocument = async (document) => {
+    try {
+      const result = await storageService.downloadFile(
+        document.storage_path,
+        document.file_name
+      );
+
+      if (result.error) {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error("Error downloading document:", error);
+      alert(`Error al descargar el archivo: ${error.message}`);
+    }
+  };
+
+  const isViewableInBrowser = (mimeType) => {
+    if (!mimeType) return false;
+
+    const viewableTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "image/svg+xml",
+      "application/pdf",
+      "text/plain",
+      "text/html",
+      "text/css",
+      "text/javascript",
+      "application/json",
+    ];
+
+    return viewableTypes.includes(mimeType.toLowerCase());
   };
 
   const getFileIcon = (mimeType) => {
@@ -93,15 +199,14 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
               </span>
               Editar
             </button>
-            <button
+
+            <Button
               className="md-button md-button-filled delete-button"
               onClick={() => setShowDeleteConfirm(true)}
+              icon={<IoTrash />}
             >
-              <span className="button-icon">
-                <IoTrash />
-              </span>
               Eliminar
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -139,7 +244,7 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
                     className="category-icon"
                     style={{ backgroundColor: expense.expense_types.color }}
                   >
-                    {expense.expense_types.icon}
+                    <IconRenderer iconId={expense.expense_types.icon} />
                   </span>
                 </div>
                 <div className="category-details">
@@ -279,8 +384,13 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
                   {expense.expense_documents.map((document) => (
                     <div
                       key={document.id}
-                      className="document-item"
-                      onClick={() => handleDocumentClick(document)}
+                      className={`document-item ${
+                        !document ? "unavailable" : ""
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDocumentClick(document);
+                      }}
                     >
                       <div className="document-icon">
                         {getFileIcon(document.mime_type)}
@@ -298,19 +408,40 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
                           <span className="document-date md-typescale-body-small">
                             {formatDateTime(document.uploaded_at)}
                           </span>
+                          {document.mime_type && (
+                            <span className="document-type md-typescale-body-small"></span>
+                          )}
                         </div>
                       </div>
                       <div className="document-actions">
-                        <button
-                          className="document-action-button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDocumentClick(document);
-                          }}
-                          title="Open document"
-                        >
-                          👁️
-                        </button>
+                        {document ? (
+                          <button
+                            className={`document-action-button ${
+                              loadingDocument === document.id ? "loading" : ""
+                            }`}
+                            disabled={loadingDocument === document.id}
+                            title={
+                              isViewableInBrowser(document.mime_type)
+                                ? "Ver archivo"
+                                : "Descargar archivo"
+                            }
+                          >
+                            {loadingDocument === document.id ? (
+                              <GoStopwatch />
+                            ) : isViewableInBrowser(document.mime_type) ? (
+                              <MdOpenInNew />
+                            ) : (
+                              <IoCloudDownloadOutline />
+                            )}
+                          </button>
+                        ) : (
+                          <span
+                            className="document-unavailable-icon"
+                            title="Archivo no disponible"
+                          >
+                            <MdClose />
+                          </span>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -389,7 +520,7 @@ const ExpenseDetails = ({ expense, onEdit, onDelete, onClose }) => {
                   onClick={handleDelete}
                   disabled={isDeleting}
                 >
-                  {isDeleting ? "Elimnando..." : "Eliminar gasto"}
+                  {isDeleting ? "Eliminando..." : "Eliminar gasto"}
                 </button>
               </div>
             </div>

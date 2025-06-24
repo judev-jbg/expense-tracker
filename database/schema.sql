@@ -626,9 +626,9 @@ DECLARE
     storage_limit BIGINT := 1073741824; -- 1GB in bytes
     result JSON;
 BEGIN
-    -- Obtener estadísticas
+    -- Obtener estadísticas corrigiendo el problema del SUM
     SELECT 
-        COALESCE(SUM(metadata->>'size')::BIGINT, 0),
+        COALESCE(SUM(COALESCE((metadata->>'size')::BIGINT, 0)), 0),
         COUNT(*),
         MIN(created_at)
     INTO total_size, file_count, oldest_file_date
@@ -662,13 +662,17 @@ DECLARE
     space_freed BIGINT := 0;
 BEGIN
     -- Obtener uso actual
-    SELECT (get_user_storage_stats(user_uuid)->>'total_size')::BIGINT INTO current_usage;
+    SELECT COALESCE(SUM(COALESCE((metadata->>'size')::BIGINT, 0)), 0)
+    INTO current_usage
+    FROM storage.objects 
+    WHERE bucket_id = 'expense-documents' 
+    AND (storage.foldername(name))[1] = user_uuid::text;
     
     -- Si está por encima del 90%, empezar limpieza
     IF current_usage > (storage_limit * cleanup_threshold) THEN
         -- Eliminar archivos más antiguos hasta llegar al 70%
         FOR files_to_delete IN
-            SELECT name, (metadata->>'size')::BIGINT as file_size
+            SELECT name, COALESCE((metadata->>'size')::BIGINT, 0) as file_size
             FROM storage.objects 
             WHERE bucket_id = 'expense-documents' 
             AND (storage.foldername(name))[1] = user_uuid::text
@@ -704,6 +708,7 @@ BEGIN
     );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
 
 -- =====================================================
 -- UPDATE EXPENSE_DOCUMENTS TABLE

@@ -270,7 +270,7 @@ export const expensesService = {
           *,
           expense_types (id, name, icon, color),
           entities (id, name, expense_types (name, icon)),
-          expense_documents (id, file_name, google_drive_url, is_receipt)
+          expense_documents (id, file_name, is_receipt, storage_path)
         `
         )
         .eq("created_by", user.id);
@@ -310,6 +310,8 @@ export const expensesService = {
         ascending: false,
       });
 
+      console.log(data);
+
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
@@ -337,9 +339,8 @@ export const expensesService = {
             file_name, 
             file_size, 
             mime_type, 
-            google_drive_url, 
-            google_drive_file_id,
             is_receipt,
+            storage_path,
             uploaded_at
           )
         `
@@ -403,7 +404,7 @@ export const expensesService = {
           *,
           expense_types (id, name, icon, color),
           entities (id, name, expense_types (name, icon)),
-          expense_documents (id, file_name, google_drive_url, is_receipt)
+          expense_documents (id, file_name, is_receipt,storage_path)
         `);
 
       if (error) throw error;
