@@ -18,8 +18,6 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker
       .register("/sw.js")
       .then((registration) => {
-        console.log("SW registered: ", registration);
-
         // Verificar actualizaciones
         registration.addEventListener("updatefound", () => {
           const newWorker = registration.installing;
