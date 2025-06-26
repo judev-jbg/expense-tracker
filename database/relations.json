@@ -1,0 +1,132 @@
+[
+  {
+    "table_from": "auth.identities",
+    "relation_name": "identities_user_id_fkey",
+    "relation_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+  },
+  {
+    "table_from": "auth.mfa_amr_claims",
+    "relation_name": "mfa_amr_claims_session_id_fkey",
+    "relation_definition": "FOREIGN KEY (session_id) REFERENCES auth.sessions(id) ON DELETE CASCADE"
+  },
+  {
+    "table_from": "auth.mfa_challenges",
+    "relation_name": "mfa_challenges_auth_factor_id_fkey",
+    "relation_definition": "FOREIGN KEY (factor_id) REFERENCES auth.mfa_factors(id) ON DELETE CASCADE"
+  },
+  {
+    "table_from": "auth.mfa_factors",
+    "relation_name": "mfa_factors_user_id_fkey",
+    "relation_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+  },
+  {
+    "table_from": "auth.one_time_tokens",
+    "relation_name": "one_time_tokens_user_id_fkey",
+    "relation_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+  },
+  {
+    "table_from": "auth.refresh_tokens",
+    "relation_name": "refresh_tokens_session_id_fkey",
+    "relation_definition": "FOREIGN KEY (session_id) REFERENCES auth.sessions(id) ON DELETE CASCADE"
+  },
+  {
+    "table_from": "auth.saml_providers",
+    "relation_name": "saml_providers_sso_provider_id_fkey",
+    "relation_definition": "FOREIGN KEY (sso_provider_id) REFERENCES auth.sso_providers(id) ON DELETE CASCADE"
+  },
+  {
+    "table_from": "auth.saml_relay_states",
+    "relation_name": "saml_relay_states_flow_state_id_fkey",
+    "relation_definition": "FOREIGN KEY (flow_state_id) REFERENCES auth.flow_state(id) ON DELETE CASCADE"
+  },
+  {
+    "table_from": "auth.saml_relay_states",
+    "relation_name": "saml_relay_states_sso_provider_id_fkey",
+    "relation_definition": "FOREIGN KEY (sso_provider_id) REFERENCES auth.sso_providers(id) ON DELETE CASCADE"
+  },
+  {
+    "table_from": "auth.sessions",
+    "relation_name": "sessions_user_id_fkey",
+    "relation_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+  },
+  {
+    "table_from": "auth.sso_domains",
+    "relation_name": "sso_domains_sso_provider_id_fkey",
+    "relation_definition": "FOREIGN KEY (sso_provider_id) REFERENCES auth.sso_providers(id) ON DELETE CASCADE"
+  },
+  {
+    "table_from": "entities",
+    "relation_name": "entities_created_by_fkey",
+    "relation_definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id) ON DELETE CASCADE"
+  },
+  {
+    "table_from": "entities",
+    "relation_name": "entities_expense_type_id_fkey",
+    "relation_definition": "FOREIGN KEY (expense_type_id) REFERENCES expense_types(id) ON DELETE CASCADE"
+  },
+  {
+    "table_from": "expense_documents",
+    "relation_name": "expense_documents_expense_id_fkey",
+    "relation_definition": "FOREIGN KEY (expense_id) REFERENCES expenses(id) ON DELETE CASCADE"
+  },
+  {
+    "table_from": "expense_documents",
+    "relation_name": "expense_documents_uploaded_by_fkey",
+    "relation_definition": "FOREIGN KEY (uploaded_by) REFERENCES auth.users(id) ON DELETE CASCADE"
+  },
+  {
+    "table_from": "expense_types",
+    "relation_name": "expense_types_created_by_fkey",
+    "relation_definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id) ON DELETE CASCADE"
+  },
+  {
+    "table_from": "expenses",
+    "relation_name": "expenses_created_by_fkey",
+    "relation_definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id) ON DELETE CASCADE"
+  },
+  {
+    "table_from": "expenses",
+    "relation_name": "expenses_entity_id_fkey",
+    "relation_definition": "FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE RESTRICT"
+  },
+  {
+    "table_from": "expenses",
+    "relation_name": "expenses_expense_type_id_fkey",
+    "relation_definition": "FOREIGN KEY (expense_type_id) REFERENCES expense_types(id) ON DELETE RESTRICT"
+  },
+  {
+    "table_from": "storage.objects",
+    "relation_name": "objects_bucketId_fkey",
+    "relation_definition": "FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id)"
+  },
+  {
+    "table_from": "storage.s3_multipart_uploads",
+    "relation_name": "s3_multipart_uploads_bucket_id_fkey",
+    "relation_definition": "FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id)"
+  },
+  {
+    "table_from": "storage.s3_multipart_uploads_parts",
+    "relation_name": "s3_multipart_uploads_parts_upload_id_fkey",
+    "relation_definition": "FOREIGN KEY (upload_id) REFERENCES storage.s3_multipart_uploads(id) ON DELETE CASCADE"
+  },
+  {
+    "table_from": "storage.s3_multipart_uploads_parts",
+    "relation_name": "s3_multipart_uploads_parts_bucket_id_fkey",
+    "relation_definition": "FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id)"
+  },
+  {
+    "table_from": "user_preferences",
+    "relation_name": "user_preferences_default_expense_type_id_fkey",
+    "relation_definition": "FOREIGN KEY (default_expense_type_id) REFERENCES expense_types(id)"
+  },
+  {
+    "table_from": "user_preferences",
+    "relation_name": "user_preferences_created_by_fkey",
+    "relation_definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id)"
+  },
+  {
+    "table_from": "user_preferences",
+    "relation_name": "user_preferences_user_id_fkey",
+    "relation_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+  }
+]
