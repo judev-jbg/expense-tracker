@@ -4,6 +4,8 @@ import EntityForm from "./EntityForm";
 import EntityCard from "./EntityCard";
 import Spinner from "../common/Spinner";
 import Button from "../common/Button";
+import { IconRenderer } from "../../libs/iconMapping";
+import { HiOfficeBuilding } from "react-icons/hi";
 
 const EntitiesManager = () => {
   const [entities, setEntities] = useState([]);
@@ -187,7 +189,7 @@ const EntitiesManager = () => {
               <option value="">Todos</option>
               {expenseTypes.map((type) => (
                 <option key={type.id} value={type.id}>
-                  {type.icon} {type.name}
+                  {type.name}
                 </option>
               ))}
             </select>
@@ -208,7 +210,9 @@ const EntitiesManager = () => {
       <div className="entities-content">
         {entities.length === 0 ? (
           <div className="empty-state md-card">
-            <div className="empty-icon">🏢</div>
+            <div className="empty-icon">
+              <HiOfficeBuilding />
+            </div>
             <h3 className="md-typescale-title-medium">Aún no hay entidades</h3>
             <p className="md-typescale-body-medium">
               Cree su primera entidad para especificar dónde gasta el dinero.
@@ -223,7 +227,7 @@ const EntitiesManager = () => {
                     className="type-icon"
                     style={{ backgroundColor: type.color }}
                   >
-                    {type.icon}
+                    <IconRenderer iconId={type.icon} />
                   </span>
                   <h3 className="md-typescale-title-medium">{type.name}</h3>
                   <span className="entity-count md-typescale-body-small">

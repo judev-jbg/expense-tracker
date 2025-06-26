@@ -5,6 +5,7 @@ import { IoIosEye, IoIosEyeOff } from "react-icons/io";
 import { AiOutlineMobile } from "react-icons/ai";
 import { MdOutlineMailOutline, MdLocationPin } from "react-icons/md";
 import { BiWorld } from "react-icons/bi";
+import { IconRenderer } from "../../libs/iconMapping";
 
 const EntityCard = ({ entity, onEdit, onDelete }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -29,7 +30,7 @@ const EntityCard = ({ entity, onEdit, onDelete }) => {
             className="type-badge"
             style={{ backgroundColor: entity.expense_types.color }}
           >
-            {entity.expense_types.icon}
+            <IconRenderer iconId={entity.expense_types.icon} />
           </span>
           <span className="type-name md-typescale-body-small">
             {entity.expense_types.name}
