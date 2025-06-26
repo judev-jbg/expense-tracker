@@ -88,6 +88,7 @@
   font-size: 1rem;
   width: 100%;
   background: transparent;
+  color: var(--md-sys-color-on-background);
   border: none;
   outline: none;
   z-index: 1;

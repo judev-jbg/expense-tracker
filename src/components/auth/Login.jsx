@@ -4,19 +4,21 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "../../contexts/AuthContext";
 import Input from "../common/Input";
 import Button from "../common/Button";
-import { MdEmail, MdLock } from "react-icons/md";
+import { MdEmail, MdLock, MdOutlineErrorOutline } from "react-icons/md";
 
 const Login = () => {
   const navigate = useNavigate();
   const { signIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
-    setError,
+    reset,
+    clearErrors,
   } = useForm({
     defaultValues: {
       email: "",
@@ -29,6 +31,7 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     setIsLoading(true);
+    clearErrors();
 
     try {
       const result = await signIn(data.email, data.password);
@@ -38,28 +41,17 @@ const Login = () => {
       } else {
         // Handle specific error messages
         if (result.error.includes("Invalid login credentials")) {
-          setError("password", {
-            type: "manual",
-            message: "Invalid email or password",
-          });
+          setLoginError("Email o contraseña no válidos");
         } else if (result.error.includes("Email not confirmed")) {
-          setError("email", {
-            type: "manual",
-            message: "Please check your email and confirm your account",
-          });
+          setLoginError("Compruebe su correo electrónico y confirme su cuenta");
         } else {
-          setError("password", {
-            type: "manual",
-            message: result.error,
-          });
+          setLoginError(result.error);
         }
       }
     } catch (error) {
-      setError("password", {
-        type: "manual",
-        message: "An unexpected error occurred",
-      });
+      setLoginError("Se ha producido un error inesperado");
     } finally {
+      reset();
       setIsLoading(false);
     }
   };
@@ -106,23 +98,38 @@ const Login = () => {
             )}
           </div>
 
-          <Input
-            label="Contraseña"
-            type="password" // El tipo inicial es password
-            id="password"
-            name="password"
-            value={passwordValue}
-            required
-            icon={<MdLock />}
-            fullWidth
-            {...register("password", {
-              required: "Password is required",
-              minLength: {
-                value: 6,
-                message: "Password must be at least 6 characters",
-              },
-            })}
-          />
+          <div className="md-text-field">
+            <Input
+              label="Contraseña"
+              type="password" // El tipo inicial es password
+              id="password"
+              name="password"
+              value={passwordValue}
+              required
+              icon={<MdLock />}
+              fullWidth
+              {...register("password", {
+                required: "Password is required",
+                minLength: {
+                  value: 6,
+                  message: "Password must be at least 6 characters",
+                },
+              })}
+            />
+
+            {errors.password && (
+              <span className="md-text-field-error">
+                {errors.password.message}
+              </span>
+            )}
+          </div>
+
+          {loginError && (
+            <div className="md-text-field-error auth-error">
+              <MdOutlineErrorOutline />
+              {loginError}
+            </div>
+          )}
 
           <div className="auth-actions">
             <Link to="/forgot-password" className="forgot-password-link">

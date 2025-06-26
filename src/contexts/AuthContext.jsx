@@ -60,7 +60,6 @@ export const AuthProvider = ({ children }) => {
   // Sign in function
   const signIn = async (email, password) => {
     try {
-      setLoading(true);
       const { data, error } = await authHelpers.signIn(email, password);
 
       if (error) {
@@ -71,8 +70,6 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error("Sign in error:", error.message);
       return { success: false, error: error.message };
-    } finally {
-      setLoading(false);
     }
   };
 
