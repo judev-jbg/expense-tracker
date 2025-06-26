@@ -254,7 +254,7 @@ const ExpenseForm = ({
               <option value="">Selecciona un tipo de gasto</option>
               {expenseTypes.map((type) => (
                 <option key={type.id} value={type.id}>
-                  {type.icon} {type.name}
+                  {type.name}
                 </option>
               ))}
             </select>

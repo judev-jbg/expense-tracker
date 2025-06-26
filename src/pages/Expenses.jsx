@@ -73,7 +73,7 @@ const Expenses = () => {
   const handleCreate = async (formData) => {
     const { tempFiles, ...expenseData } = formData; // Separar archivos temporales
 
-    const { data, error } = await expenseService.create(expenseData);
+    const { data, error } = await expensesService.create(expenseData);
 
     if (error) {
       setError(error);
