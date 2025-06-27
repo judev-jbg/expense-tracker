@@ -8,7 +8,8 @@ import { expenseDocumentsService } from "../../libs/configService";
 import { useAuth } from "../../contexts/AuthContext";
 
 const FileUpload = ({
-  expenseId,
+  expenseId = null,
+  tempSessionId = null,
   onFileUpload,
   uploadedFiles = [],
   onFileRemove,
@@ -35,6 +36,13 @@ const FileUpload = ({
     "text/plain",
   ];
 
+  // Generar ID de sesión temporal si no se proporciona
+  const [currentTempSessionId] = useState(
+    () =>
+      tempSessionId ||
+      `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  );
+
   const maxFileSize = 10 * 1024 * 1024; // 10MB
   const maxFiles = 10;
 
@@ -52,7 +60,6 @@ const FileUpload = ({
     try {
       const result = await storageService.getStorageStats(user.id);
       if (!result.error) {
-        console.log("Storage info loaded:", result.data);
         setStorageInfo(result.data);
       } else {
         console.error("Error loading storage info:", result.error);
@@ -232,12 +239,24 @@ const FileUpload = ({
         }));
       }, 200);
 
-      // Subir a Supabase Storage
-      const uploadResult = await storageService.uploadFile(
-        file,
-        expenseId,
-        user.id
-      );
+      let uploadResult;
+
+      // Subir a storage (temporal o definitivo)
+      if (expenseId) {
+        // Subida definitiva (modo edición)
+        uploadResult = await storageService.uploadFile(
+          file,
+          expenseId,
+          user.id
+        );
+      } else {
+        // Subida temporal (modo creación)
+        uploadResult = await storageService.uploadTempFile(
+          file,
+          currentTempSessionId,
+          user.id
+        );
+      }
 
       clearInterval(progressInterval);
       setUploadProgress((prev) => ({ ...prev, [fileId]: 90 }));
@@ -258,7 +277,21 @@ const FileUpload = ({
         is_available: true,
       };
 
-      const dbResult = await expenseDocumentsService.create(documentData);
+      let dbResult;
+
+      if (expenseId) {
+        // Crear documento definitivo
+        dbResult = await expenseDocumentsService.create({
+          ...documentData,
+          expense_id: expenseId,
+        });
+      } else {
+        // Crear documento temporal
+        dbResult = await expenseDocumentsService.createTemp(
+          documentData,
+          currentTempSessionId
+        );
+      }
 
       if (dbResult.error) {
         // Si falla guardar en DB, eliminar archivo de storage
@@ -283,6 +316,7 @@ const FileUpload = ({
           ...dbResult.data,
           url: uploadResult.data.url,
           storage_url: uploadResult.data.url,
+          tempSessionId: expenseId ? null : currentTempSessionId,
         },
         error: null,
       };

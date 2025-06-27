@@ -107,7 +107,7 @@ const ExpenseTypesManager = () => {
         </div>
 
         <Button onClick={() => setShowForm(true)} disabled={showForm}>
-          Agregar gasto
+          Agregar tipo de gasto
         </Button>
       </div>
 

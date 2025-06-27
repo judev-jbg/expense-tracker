@@ -1,4 +1,5 @@
 import { supabase, dbHelpers } from "./supabase";
+import { supabaseAdmin } from "./supabaseAdmin";
 import React from "react";
 import {
   AiFillPieChart,
@@ -362,13 +363,17 @@ export const expensesService = {
       } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      // Extraer tempSessionId si existe
+      const { tempSessionId, ...cleanExpenseData } = expenseData;
+
       // Parse date and extract year/month
-      const expenseDate = new Date(expenseData.expense_date);
+      const expenseDate = new Date(cleanExpenseData.expense_date);
       const year = expenseDate.getFullYear();
       const month = expenseDate.getMonth() + 1;
 
+      // Crear el gasto
       const { data, error } = await supabase.from("expenses").insert({
-        ...expenseData,
+        ...cleanExpenseData,
         year,
         month,
         created_by: user.id,
@@ -379,7 +384,27 @@ export const expensesService = {
         `);
 
       if (error) throw error;
-      return { data: data[0], error: null };
+
+      const createdExpense = data[0];
+
+      // Si hay una sesión temporal, mover los archivos
+      if (tempSessionId) {
+        const moveResult = await storageService.moveTempFiles(
+          tempSessionId,
+          createdExpense.id,
+          user.id
+        );
+
+        if (moveResult.error) {
+          console.error("Error moving temp files:", moveResult.error);
+          // El gasto se creó, pero algunos archivos pueden no haberse movido
+        } else {
+          // Actualizar el gasto con los documentos
+          createdExpense.expense_documents = moveResult.data || [];
+        }
+      }
+
+      return { data: createdExpense, error: null };
     } catch (error) {
       return { data: null, error: error.message };
     }
@@ -760,7 +785,7 @@ export const dashboardService = {
         insights.push({
           type: "most_expensive_month",
           title: "Mes de mayor gasto",
-          description: `Usted fue el que más gastó en ${new Date(
+          description: `${new Date(
             year,
             mostExpensiveMonth.month - 1
           ).toLocaleDateString("es-ES", { month: "long" })}`,
@@ -805,7 +830,7 @@ export const dashboardService = {
         insights.push({
           type: "most_frequent",
           title: "Categoría más frecuente",
-          description: `${topType.type} aparece más a menudo en sus gastos`,
+          description: `${topType.type}`,
           value: topType.count,
           icon: React.createElement(AiFillPieChart, null),
         });
@@ -822,9 +847,13 @@ export const userManagementService = {
   isAdmin: async () => {
     try {
       const { data, error } = await supabase.rpc("is_admin");
-      if (error) throw error;
-      return { isAdmin: data, error: null };
+      if (error) {
+        console.error("Error checking admin status:", error);
+        return { isAdmin: false, error: error.message };
+      }
+      return { isAdmin: data || false, error: null };
     } catch (error) {
+      console.error("Exception checking admin status:", error);
       return { isAdmin: false, error: error.message };
     }
   },
@@ -833,9 +862,13 @@ export const userManagementService = {
   getUserRole: async () => {
     try {
       const { data, error } = await supabase.rpc("get_user_role");
-      if (error) throw error;
-      return { role: data, error: null };
+      if (error) {
+        console.error("Error getting user role:", error);
+        return { role: "user", error: error.message };
+      }
+      return { role: data || "user", error: null };
     } catch (error) {
+      console.error("Exception getting user role:", error);
       return { role: "user", error: error.message };
     }
   },
@@ -843,14 +876,55 @@ export const userManagementService = {
   // Get all users (admin only)
   getAllUsers: async () => {
     try {
-      const { data, error } = await supabase
-        .from("user_management_view")
-        .select("*")
-        .order("registered_at", { ascending: false });
+      // Verificar permisos
+      const adminCheck = await userManagementService.isAdmin();
+      if (!adminCheck.isAdmin) {
+        return { data: null, error: "Usuario no autorizado" };
+      }
 
-      if (error) throw error;
-      return { data, error: null };
+      // Obtener usuarios directamente desde auth.users + user_preferences
+      const { data: users, error: usersError } =
+        await supabaseAdmin.auth.admin.listUsers();
+
+      if (usersError) {
+        console.error("Error getting users:", usersError);
+        return { data: null, error: usersError.message };
+      }
+
+      // Obtener preferencias de todos los usuarios
+      const { data: preferences, error: prefsError } = await supabaseAdmin
+        .from("user_preferences")
+        .select("*");
+
+      if (prefsError) {
+        console.error("Error getting preferences:", prefsError);
+        return { data: null, error: prefsError.message };
+      }
+
+      // Combinar datos
+      const combinedData = users.users.map((user) => {
+        const userPrefs = preferences.find((p) => p.user_id === user.id) || {};
+        return {
+          id: user.id,
+          email: user.email,
+          registered_at: user.created_at,
+          last_sign_in_at: user.last_sign_in_at,
+          email_confirmed_at: user.email_confirmed_at,
+          first_name: user.user_metadata?.first_name || "",
+          last_name: user.user_metadata?.last_name || "",
+          full_name: user.user_metadata?.full_name || "",
+          role: userPrefs.role || "user",
+          is_active: userPrefs.is_active !== false,
+          created_by: userPrefs.created_by,
+          profile_created_at: userPrefs.created_at,
+          currency: userPrefs.currency || "EUR",
+          theme: userPrefs.theme || "dark",
+        };
+      });
+
+      return { data: combinedData, error: null };
     } catch (error) {
+      console.error("Exception getting users:", error);
       return { data: null, error: error.message };
     }
   },
@@ -874,12 +948,18 @@ export const userManagementService = {
   // Create new user (admin only)
   createUser: async (userData) => {
     try {
-      // First create the user account
+      // Verificar permisos admin
+      const adminCheck = await userManagementService.isAdmin();
+      if (!adminCheck.isAdmin) {
+        return { data: null, error: "No tienes permisos para crear usuarios" };
+      }
+
+      // Crear usuario
       const { data: authData, error: authError } =
-        await supabase.auth.admin.createUser({
+        await supabaseAdmin.auth.admin.createUser({
           email: userData.email,
           password: userData.password,
-          email_confirm: true, // Auto-confirm email
+          email_confirm: true,
           user_metadata: {
             first_name: userData.firstName,
             last_name: userData.lastName,
@@ -887,27 +967,31 @@ export const userManagementService = {
           },
         });
 
-      if (authError) throw authError;
+      if (authError) {
+        console.error("Error creating user:", authError);
+        return { data: null, error: authError.message };
+      }
 
-      // Wait a bit for the trigger to create user preferences
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Update user preferences with correct role
-      const { error: prefsError } = await supabase
+      // Crear preferencias de usuario
+      const { error: prefsError } = await supabaseAdmin
         .from("user_preferences")
-        .update({
+        .insert({
+          user_id: authData.user.id,
           role: userData.role || "user",
           currency: userData.currency || "EUR",
           theme: userData.theme || "dark",
-        })
-        .eq("user_id", authData.user.id);
+          is_active: userData.is_active !== false,
+          created_by: authData.user.id,
+        });
 
       if (prefsError) {
-        console.error("Error updating user preferences:", prefsError);
+        console.error("Error creating user preferences:", prefsError);
+        // No fallar si solo las preferencias fallan
       }
 
       return { data: authData.user, error: null };
     } catch (error) {
+      console.error("Exception creating user:", error);
       return { data: null, error: error.message };
     }
   },
@@ -915,18 +999,38 @@ export const userManagementService = {
   // Update user (admin only)
   updateUser: async (userId, updates) => {
     try {
-      const { data, error } = await supabase.auth.admin.updateUserById(userId, {
+      // Verificar permisos de admin
+      const adminCheck = await userManagementService.isAdmin();
+      if (!adminCheck.isAdmin) {
+        return { data: null, error: "Usuario no autorizado" };
+      }
+
+      // Actualizar usando cliente admin
+      const updateData = {
         email: updates.email,
         user_metadata: {
           first_name: updates.firstName,
           last_name: updates.lastName,
           full_name: `${updates.firstName} ${updates.lastName}`,
         },
-      });
+      };
 
-      if (error) throw error;
+      // Solo actualizar contraseña si se proporciona
+      if (updates.password) {
+        updateData.password = updates.password;
+      }
 
-      // Update user preferences
+      const { data, error } = await supabaseAdmin.auth.admin.updateUserById(
+        userId,
+        updateData
+      );
+
+      if (error) {
+        console.error("Error updating user:", error);
+        return { data: null, error: error.message };
+      }
+
+      // Actualizar preferencias
       if (
         updates.role ||
         updates.currency ||
@@ -940,7 +1044,7 @@ export const userManagementService = {
         if (updates.hasOwnProperty("is_active"))
           prefsUpdate.is_active = updates.is_active;
 
-        const { error: prefsError } = await supabase
+        const { error: prefsError } = await supabaseAdmin
           .from("user_preferences")
           .update(prefsUpdate)
           .eq("user_id", userId);
@@ -952,6 +1056,7 @@ export const userManagementService = {
 
       return { data, error: null };
     } catch (error) {
+      console.error("Exception updating user:", error);
       return { data: null, error: error.message };
     }
   },
@@ -989,13 +1094,26 @@ export const userManagementService = {
   // Reset user password (admin only)
   resetUserPassword: async (userId, newPassword) => {
     try {
-      const { data, error } = await supabase.auth.admin.updateUserById(userId, {
-        password: newPassword,
-      });
+      const adminCheck = await userManagementService.isAdmin();
+      if (!adminCheck.isAdmin) {
+        return { data: null, error: "Usuario no autorizado" };
+      }
 
-      if (error) throw error;
+      const { data, error } = await supabaseAdmin.auth.admin.updateUserById(
+        userId,
+        {
+          password: newPassword,
+        }
+      );
+
+      if (error) {
+        console.error("Error resetting password:", error);
+        return { data: null, error: error.message };
+      }
+
       return { data, error: null };
     } catch (error) {
+      console.error("Exception resetting password:", error);
       return { data: null, error: error.message };
     }
   },
@@ -1071,6 +1189,49 @@ export const expenseDocumentsService = {
 
       if (error) throw error;
       return { data: data[0], error: null };
+    } catch (error) {
+      return { data: null, error: error.message };
+    }
+  },
+
+  // Crear documento temporal
+  createTemp: async (documentData, tempSessionId) => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { data, error } = await supabase
+        .from("expense_documents")
+        .insert({
+          ...documentData,
+          expense_id: null, // Temporal, sin expense_id
+          temp_upload_session: tempSessionId,
+          is_temp: true,
+          uploaded_by: user.id,
+        })
+        .select();
+
+      if (error) throw error;
+      return { data: data[0], error: null };
+    } catch (error) {
+      return { data: null, error: error.message };
+    }
+  },
+
+  // Obtener archivos temporales por sesión
+  getTempBySession: async (tempSessionId) => {
+    try {
+      const { data, error } = await supabase
+        .from("expense_documents")
+        .select("*")
+        .eq("temp_upload_session", tempSessionId)
+        .eq("is_temp", true)
+        .order("uploaded_at", { ascending: false });
+
+      if (error) throw error;
+      return { data, error: null };
     } catch (error) {
       return { data: null, error: error.message };
     }

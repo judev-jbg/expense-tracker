@@ -188,4 +188,153 @@ export const storageService = {
       return { data: false, error: error.message };
     }
   },
+
+  // Subir archivo temporal (sin expenseId)
+  uploadTempFile: async (file, tempSessionId, userId) => {
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `temp/${userId}/${tempSessionId}/${Date.now()}-${Math.random()
+        .toString(36)
+        .substr(2, 9)}.${fileExt}`;
+
+      // Verificar espacio disponible
+      const spaceCheck = await storageService.checkStorageSpace(userId);
+      if (!spaceCheck.canUpload) {
+        const cleanup = await storageService.cleanupOldFiles(userId);
+        const recheckSpace = await storageService.checkStorageSpace(userId);
+        if (!recheckSpace.canUpload) {
+          throw new Error(
+            `Espacio insuficiente. Usado: ${recheckSpace.usagePercentage}%`
+          );
+        }
+      }
+
+      const { data, error } = await supabase.storage
+        .from("expense-documents")
+        .upload(fileName, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (error) throw error;
+
+      const { data: urlData } = supabase.storage
+        .from("expense-documents")
+        .getPublicUrl(fileName);
+
+      return {
+        data: {
+          path: data.path,
+          fullPath: data.fullPath,
+          url: urlData.publicUrl,
+          fileName: file.name,
+          fileSize: file.size,
+          mimeType: file.type,
+        },
+        error: null,
+      };
+    } catch (error) {
+      return { data: null, error: error.message };
+    }
+  },
+
+  // Mover archivos temporales a definitivos
+  moveTempFiles: async (tempSessionId, expenseId, userId) => {
+    try {
+      // Obtener archivos temporales de la sesión
+      const { data: tempFiles, error: fetchError } = await supabase
+        .from("expense_documents")
+        .select("*")
+        .eq("temp_upload_session", tempSessionId)
+        .eq("is_temp", true);
+
+      if (fetchError) throw fetchError;
+
+      const movedFiles = [];
+
+      for (const tempFile of tempFiles) {
+        // Crear nueva ruta definitiva
+        const fileExt = tempFile.file_name.split(".").pop();
+        const newFileName = `${userId}/${expenseId}/${Date.now()}-${Math.random()
+          .toString(36)
+          .substr(2, 9)}.${fileExt}`;
+
+        // Mover archivo en storage
+        const { data: moveData, error: moveError } = await supabase.storage
+          .from("expense-documents")
+          .move(tempFile.storage_path, newFileName);
+
+        if (moveError) {
+          console.error("Error moving file:", moveError);
+          continue; // Continuar con otros archivos
+        }
+
+        // Actualizar registro en base de datos
+        const { data: updatedFile, error: updateError } = await supabase
+          .from("expense_documents")
+          .update({
+            expense_id: expenseId,
+            storage_path: newFileName,
+            is_temp: false,
+            temp_upload_session: null,
+            temp_created_at: null,
+          })
+          .eq("id", tempFile.id)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error("Error updating file record:", updateError);
+        } else {
+          movedFiles.push(updatedFile);
+        }
+      }
+
+      return { data: movedFiles, error: null };
+    } catch (error) {
+      return { data: null, error: error.message };
+    }
+  },
+
+  // Limpiar archivos temporales de una sesión
+  cleanupTempSession: async (tempSessionId) => {
+    try {
+      // Obtener archivos de la sesión
+      const { data: tempFiles, error: fetchError } = await supabase
+        .from("expense_documents")
+        .select("storage_path")
+        .eq("temp_upload_session", tempSessionId)
+        .eq("is_temp", true);
+
+      if (fetchError) throw fetchError;
+
+      // Eliminar archivos del storage
+      const paths = tempFiles.map((f) => f.storage_path);
+      if (paths.length > 0) {
+        const { error: storageError } = await supabase.storage
+          .from("expense-documents")
+          .remove(paths);
+
+        if (storageError) {
+          console.error(
+            "Error removing temp files from storage:",
+            storageError
+          );
+        }
+      }
+
+      // Eliminar registros de la base de datos
+      const { error: dbError } = await supabase
+        .from("expense_documents")
+        .delete()
+        .eq("temp_upload_session", tempSessionId)
+        .eq("is_temp", true);
+
+      if (dbError) throw dbError;
+
+      return { error: null };
+    } catch (error) {
+      return { error: error.message };
+    }
+  },
 };

@@ -18,6 +18,9 @@ const ExpenseForm = ({
   const [filteredEntities, setFilteredEntities] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [tempFiles, setTempFiles] = useState([]); // Archivos temporales para nuevo gasto
+  const [tempSessionId] = useState(
+    () => `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  );
 
   const {
     register,
@@ -108,14 +111,20 @@ const ExpenseForm = ({
       amount,
       tags: tags.length > 0 ? tags : null,
       notes: data.notes || null,
-      tempFiles: tempFiles, // Pasar archivos temporales para nuevo gasto
     };
+
+    // Si no estamos editando y hay archivos temporales, incluir sessionId
+    if (!isEditing && tempFiles.length > 0) {
+      submitData.tempSessionId = tempSessionId;
+    }
 
     const success = await onSubmit(submitData);
     if (success && !isEditing) {
       reset();
       setUploadedFiles([]);
       setTempFiles([]);
+      // Limpiar cualquier archivo temporal restante
+      await storageService.cleanupTempSession(tempSessionId);
     }
   };
 
@@ -390,9 +399,10 @@ const ExpenseForm = ({
           {isEditing && expense?.id ? (
             // Para edición, usar el expense ID real
             <FileUpload
-              expenseId={expense.id}
+              expenseId={isEditing ? expense?.id : null}
+              tempSessionId={!isEditing ? tempSessionId : null}
               onFileUpload={handleFileUpload}
-              uploadedFiles={uploadedFiles}
+              uploadedFiles={isEditing ? uploadedFiles : tempFiles}
               onFileRemove={handleFileRemove}
               disabled={isSubmitting}
             />

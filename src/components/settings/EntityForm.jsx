@@ -88,6 +88,7 @@ const EntityForm = ({
                 required: "Expense type is required",
               })}
               disabled={isSubmitting}
+              autoFocus="true"
             >
               <option value="">Selecciona el tipo de gasto</option>
               {expenseTypes.map((type) => (
