@@ -3,6 +3,7 @@ import { IoTrash } from "react-icons/io5";
 import { MdModeEditOutline } from "react-icons/md";
 import { IoMdPricetags } from "react-icons/io";
 import { IconRenderer } from "../../libs/iconMapping";
+import { MdOutlineAttachFile } from "react-icons/md";
 
 const ExpenseCard = ({ expense, onEdit, onDelete, onView }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -104,7 +105,7 @@ const ExpenseCard = ({ expense, onEdit, onDelete, onView }) => {
               className="document-indicator"
               title={`${expense.expense_documents.length} document(s)`}
             >
-              📎 {expense.expense_documents.length}
+              <MdOutlineAttachFile /> {expense.expense_documents.length}
             </span>
           )}
           {expense.tags && expense.tags.length > 0 && (

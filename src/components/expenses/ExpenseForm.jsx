@@ -21,6 +21,7 @@ const ExpenseForm = ({
   const [tempSessionId] = useState(
     () => `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   );
+  const [entityValue, setEntityValue] = useState("");
 
   const {
     register,
@@ -45,7 +46,13 @@ const ExpenseForm = ({
 
   useEffect(() => {
     if (expense) {
-      // Formato de fecha para input
+      // Configurar entidades filtradas PRIMERO
+      const expenseEntities = entities.filter(
+        (entity) => entity.expense_type_id === expense.expense_type_id
+      );
+      setFilteredEntities(expenseEntities);
+      setSelectedTypeId(expense.expense_type_id);
+
       const expenseDate = new Date(expense.expense_date);
       const formattedDate = expenseDate.toISOString().split("T")[0];
 
@@ -59,27 +66,32 @@ const ExpenseForm = ({
         tags: expense.tags ? expense.tags.join(", ") : "",
       });
 
-      setSelectedTypeId(expense.expense_type_id);
+      // FORZAR el valor después del reset
+      setEntityValue(expense.entity_id);
+      setValue("entity_id", expense.entity_id);
+
       setUploadedFiles(expense.expense_documents || []);
     } else {
-      // Set default date to today
       const today = new Date().toISOString().split("T")[0];
       setValue("expense_date", today);
       setUploadedFiles([]);
       setTempFiles([]);
+      setFilteredEntities([]);
+      setSelectedTypeId("");
+      setEntityValue("");
     }
-  }, [expense, reset, setValue]);
-
-  // Filter entities when expense type changes
+  }, [expense, reset, setValue, entities]);
+  // Segundo useEffect SOLO para nuevos gastos
   useEffect(() => {
-    if (watchedTypeId) {
+    // Solo ejecutar si NO hay expense (nuevo gasto)
+    if (!expense && watchedTypeId) {
       const typeEntities = entities.filter(
         (entity) => entity.expense_type_id === watchedTypeId
       );
       setFilteredEntities(typeEntities);
       setSelectedTypeId(watchedTypeId);
 
-      // Reset entity selection if current entity doesn't match new type
+      // Reset entity si no es válida
       const currentEntityId = watch("entity_id");
       const currentEntityValid = typeEntities.some(
         (entity) => entity.id === currentEntityId
@@ -87,14 +99,25 @@ const ExpenseForm = ({
       if (!currentEntityValid) {
         setValue("entity_id", "");
       }
-    } else {
+    } else if (!expense && !watchedTypeId) {
       setFilteredEntities([]);
       setSelectedTypeId("");
       setValue("entity_id", "");
     }
-  }, [watchedTypeId, entities, setValue, watch]);
+  }, [watchedTypeId, entities, setValue, expense]);
+
+  useEffect(() => {
+    if (expense && filteredEntities.length > 0 && expense.entity_id) {
+      setEntityValue(expense.entity_id);
+      setValue("entity_id", expense.entity_id);
+    }
+  }, [expense, filteredEntities, setValue]);
 
   const onFormSubmit = async (data) => {
+    if (!entityValue) {
+      // Puedes usar react-hook-form para mostrar el error
+      return;
+    }
     // Process tags
     const tags = data.tags
       ? data.tags
@@ -108,6 +131,7 @@ const ExpenseForm = ({
 
     const submitData = {
       ...data,
+      entity_id: entityValue,
       amount,
       tags: tags.length > 0 ? tags : null,
       notes: data.notes || null,
@@ -286,9 +310,12 @@ const ExpenseForm = ({
               className={`md-text-field-input ${
                 errors.entity_id ? "error" : ""
               }`}
-              {...register("entity_id", {
-                required: "La entidad es obligatoria",
-              })}
+              value={entityValue} // ← Valor controlado
+              onChange={(e) => {
+                const newValue = e.target.value;
+                setEntityValue(newValue);
+                setValue("entity_id", newValue);
+              }}
               disabled={isSubmitting || !selectedTypeId}
             >
               <option value="">
@@ -296,6 +323,7 @@ const ExpenseForm = ({
                   ? "Seleccionar entidad"
                   : "Seleccione primero el tipo de gasto"}
               </option>
+
               {filteredEntities.map((entity) => (
                 <option key={entity.id} value={entity.id}>
                   {entity.name}

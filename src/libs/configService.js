@@ -20,7 +20,7 @@ export const expenseTypesService = {
       const { data, error } = await supabase
         .from("expense_types")
         .select("*")
-        .eq("created_by", user.id)
+        // .eq("created_by", user.id)
         .eq("is_active", true)
         .order("name");
 
@@ -108,7 +108,7 @@ export const entitiesService = {
           )
         `
         )
-        .eq("created_by", user.id)
+        // .eq("created_by", user.id)
         .eq("is_active", true);
 
       if (expenseTypeId) {
@@ -264,17 +264,15 @@ export const expensesService = {
       } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      let query = supabase
-        .from("expenses")
-        .select(
-          `
+      let query = supabase.from("expenses").select(
+        `
           *,
           expense_types (id, name, icon, color),
           entities (id, name, expense_types (name, icon)),
           expense_documents (id, file_name, is_receipt, storage_path)
         `
-        )
-        .eq("created_by", user.id);
+      );
+      // .eq("created_by", user.id);
 
       // Apply filters
       if (filters.year) {
@@ -466,7 +464,7 @@ export const expensesService = {
           expense_types (name, icon, color)
         `
         )
-        .eq("created_by", user.id)
+        // .eq("created_by", user.id)
         .eq("year", year);
 
       if (month) {
@@ -539,7 +537,7 @@ export const dashboardService = {
           entities (id, name)
         `
         )
-        .eq("created_by", user.id)
+        // .eq("created_by", user.id)
         .eq("year", year);
 
       if (month) {
